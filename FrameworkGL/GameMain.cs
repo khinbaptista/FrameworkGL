@@ -14,7 +14,7 @@ namespace FrameworkGL
     {
         #region Static attributes
 
-        public static Rectangle Viewport { get; protected set; }
+        public static Vector2 Viewport { get; protected set; }
         public static Camera ActiveCamera { get; protected set; }
         public static float DeltaTime { get; protected set; }
 
@@ -24,14 +24,14 @@ namespace FrameworkGL
         #region Methods
 
         public GameMain()
-            : base(1600, 900, GraphicsMode.Default, "ROD14465894 - CGP2012M - Graphics - Assessment 01") {
+            : base(1600, 900, GraphicsMode.Default, "ROD14465894 - Graphics (CGP2012M) - Assessment 01") {
                 VSync = VSyncMode.Adaptive;
         }
 
         protected override void OnLoad(EventArgs e) {
             base.OnLoad(e);
 
-            Viewport = new Rectangle(0, 0, Width, Height);
+            Viewport = new Vector2(Width, Height);
             DeltaTime = 0.0f;
             ActiveCamera = new Camera(new Vector3(), new Vector3(0, 0, -1), Vector3.UnitY);
         }
