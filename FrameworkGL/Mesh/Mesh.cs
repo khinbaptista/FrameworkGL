@@ -30,7 +30,7 @@ namespace FrameworkGL
 
         protected List<Vector3> vertices;
         protected List<Vector3> normals;
-        protected List<Vector3> colors;
+        protected List<Vector4> colors;
         protected List<Vector2> texCoords;
         protected List<uint> indices;
 
@@ -46,7 +46,7 @@ namespace FrameworkGL
 
         public List<Vector3> Normals { get { return normals; } }
 
-        public List<Vector3> Colors { get { return colors; } }
+        public List<Vector4> Colors { get { return colors; } }
 
         public List<Vector2> TexCoords { get { return texCoords; } }
 
@@ -61,7 +61,7 @@ namespace FrameworkGL
 
             vertices = new List<Vector3>();
             normals = new List<Vector3>();
-            colors = new List<Vector3>();
+            colors = new List<Vector4>();
             texCoords = new List<Vector2>();
             indices = new List<uint>();
         }
@@ -85,6 +85,34 @@ namespace FrameworkGL
             foreach (uint index in data.Indices)
                 indices.Add(index);
         }
+
+        #region Add data manually
+
+        public void AddVertex(Vector3 vertex) {
+            vertices.Add(vertex);
+        }
+
+        public void AddNormal(Vector3 normal) {
+            normals.Add(normal);
+        }
+
+        public void AddColor(Vector4 color) {
+            colors.Add(color);
+        }
+
+        public void AddColor(Color color) {
+            this.AddColor(new Vector4(color.R / 255, color.G / 255, color.B / 255, color.A / 255));
+        }
+
+        public void AddTexCoord(Vector2 texCoord) {
+            texCoords.Add(texCoord);
+        }
+
+        public void AddIndex(uint index) {
+            indices.Add(index);
+        }
+
+        #endregion
 
         public void SetUp() {
             if (colors.Count > 0) hasColors = true;
@@ -118,6 +146,8 @@ namespace FrameworkGL
             id = GL.GenVertexArray();
         }
 
+        #region Load buffers
+
         private void LoadArrayBuffer(int buffer, Vector2[] data) {
             GL.BindBuffer(BufferTarget.ArrayBuffer, buffer);
             GL.BufferData(BufferTarget.ArrayBuffer, new IntPtr(data.Length * Vector2.SizeInBytes), data, BufferUsageHint.StaticDraw);
@@ -134,6 +164,14 @@ namespace FrameworkGL
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
         }
 
+        private void LoadArrayBuffer(int buffer, Vector4[] data) {
+            GL.BindBuffer(BufferTarget.ArrayBuffer, buffer);
+            GL.BufferData(BufferTarget.ArrayBuffer, new IntPtr(data.Length * Vector4.SizeInBytes), data, BufferUsageHint.StaticDraw);
+
+            // Clean up
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+        }
+
         private void LoadIndices(int buffer, uint[] data) {
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, buffer);
             GL.BufferData<uint>(BufferTarget.ElementArrayBuffer, new IntPtr(data.Length * sizeof(uint)), data, BufferUsageHint.StaticDraw);
@@ -141,6 +179,10 @@ namespace FrameworkGL
             // Clean up
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
         }
+
+        #endregion
+
+        #region Draw
 
         public void Draw() {
             GL.BindVertexArray(id);
@@ -184,6 +226,8 @@ namespace FrameworkGL
             if (isIndexed)
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
         }
+
+        #endregion
 
         #endregion
     }

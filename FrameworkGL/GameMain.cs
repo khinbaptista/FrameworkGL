@@ -18,6 +18,8 @@ namespace FrameworkGL
         public static Camera ActiveCamera { get; protected set; }
         public static float DeltaTime { get; protected set; }
 
+
+
         #endregion
 
 
@@ -33,7 +35,7 @@ namespace FrameworkGL
 
             Viewport = new Vector2(Width, Height);
             DeltaTime = 0.0f;
-            ActiveCamera = new Camera(new Vector3(), new Vector3(0, 0, -1), Vector3.UnitY);
+            ActiveCamera = new Camera(new Vector3(0, 0, 10), new Vector3(0, 0, -1), Vector3.UnitY);
         }
 
         protected override void OnKeyDown(KeyboardKeyEventArgs e) {
