@@ -63,9 +63,9 @@ namespace FrameworkGL
 
             if (e.Key == Key.Escape)
                 Exit();
-            else if (e.Key == Key.A)
-                shader.TransformationMatrix *= Matrix4.CreateTranslation(0.5f * DeltaTime, 0.0f, 0.0f);
             else if (e.Key == Key.D)
+                shader.TransformationMatrix *= Matrix4.CreateTranslation(0.5f * DeltaTime, 0.0f, 0.0f);
+            else if (e.Key == Key.A)
                 shader.TransformationMatrix *= Matrix4.CreateTranslation(-0.5f * DeltaTime, 0.0f, 0.0f);
         }
 
