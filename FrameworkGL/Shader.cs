@@ -139,8 +139,13 @@ namespace FrameworkGL
         #region Methods
 
         public Shader() {
+            if (!IsSupported) throw new Exception("The system does not support shaders.\r\n");
+
             id = GL.CreateProgram();
+
             uniforms = new Dictionary<string, int>();
+            vertexShaderID = -1;
+            fragmentShaderID = -1;
 
             InitializeVariableNames();
             InitializeVariableValues();
@@ -177,8 +182,31 @@ namespace FrameworkGL
             bumpMap = -1;
         }
 
+        /// <summary>
+        /// Creates a new shader
+        /// </summary>
+        /// <param name="type">Type of shader to be created (only vertex or fragment shaders supported)</param>
+        /// <param name="source">Source code of the shader</param>
         public void AddShader(ShaderType type, string source) {
+            int statusCode = -1;
+            string info = "";
 
+            int shaderID = GL.CreateShader(type);
+            GL.ShaderSource(shaderID, source);
+            GL.CompileShader(shaderID);
+
+            GL.GetShaderInfoLog(shaderID, out info);
+            GL.GetShader(shaderID, ShaderParameter.CompileStatus, out statusCode);
+
+            if (statusCode != 1) {
+                GL.DeleteShader(shaderID);
+                throw new Exception("Error creating shader.\r\nStatus code: " + statusCode + " > " + info);
+            }
+
+            if (type == ShaderType.FragmentShader)
+                fragmentShaderID = shaderID;
+            else if (type == ShaderType.VertexShader)
+                vertexShaderID = shaderID;
         }
 
         /// <summary>
@@ -194,28 +222,117 @@ namespace FrameworkGL
             this.AddShader(type, source);
         }
 
+        /// <summary>
+        /// Links the shader so they are usable
+        /// </summary>
         public void Link() {
+            int statusCode = -1;
+            string info = "";
 
+            if (vertexShaderID != -1)
+                GL.AttachShader(id, vertexShaderID);
+
+            if (fragmentShaderID != -1)
+                GL.AttachShader(id, fragmentShaderID);
+
+            GL.BindAttribLocation(id, (int)ArrayIndex.VertexPosition, NameOf_VertexPosition);
+            GL.BindAttribLocation(id, (int)ArrayIndex.VertexColor, NameOf_VertexColor);
+            GL.BindAttribLocation(id, (int)ArrayIndex.VertexNormal, NameOf_VertexNormal);
+            GL.BindAttribLocation(id, (int)ArrayIndex.VertexTexCoord, NameOf_VertexTexCoord);
+
+            GL.LinkProgram(id);
+
+            GL.GetProgramInfoLog(id, out info);
+            GL.GetProgram(id, GetProgramParameterName.LinkStatus, out statusCode);
+
+            if (statusCode != -1) {
+                GL.DeleteProgram(id);
+                throw new Exception("Error linking program.\r\nStatus code: " + statusCode + " > " + info);
+            }
+
+            if (vertexShaderID != -1) {
+                GL.DetachShader(id, vertexShaderID);
+                GL.DeleteShader(vertexShaderID);
+                vertexShaderID = -1;
+            }
+
+            if (fragmentShaderID != -1) {
+                GL.DetachShader(id, fragmentShaderID);
+                GL.DeleteShader(fragmentShaderID);
+                fragmentShaderID = -1;
+            }
         }
 
+        public void Activate() {
+            GL.UseProgram(id);
+        }
+
+        public void Deactivate() {
+            GL.UseProgram(0);
+        }
+
+        public void Dispose() {
+            GL.DeleteProgram(id);
+        }
+
+        #region Change shader uniform values
+
         private int GetVariableLocation(string name) {
-            return 0;
+            if (uniforms.ContainsKey(name))
+                return uniforms[name];
+
+            int location = GL.GetUniformLocation(id, name);
+
+            if (location != -1)
+                uniforms.Add(name, location);
+            else
+                Console.WriteLine("Failed to retrieve location of uniform variable \"" + name + "\".", "Error");
+
+            return location;
         }
 
         public void SetVariable(string name, float value) {
+            GL.UseProgram(id);
 
+            int location = GetVariableLocation(name);
+
+            if (location != -1)
+                GL.Uniform1(location, value);
+
+            GL.UseProgram(0);
         }
 
         public void SetVariable(string name, float x, float y) {
+            GL.UseProgram(id);
 
+            int location = GetVariableLocation(name);
+
+            if (location != -1)
+                GL.Uniform2(location, x, y);
+
+            GL.UseProgram(0);
         }
 
         public void SetVariable(string name, float x, float y, float z) {
+            GL.UseProgram(id);
 
+            int location = GetVariableLocation(name);
+
+            if (location != -1)
+                GL.Uniform3(location, x, y, z);
+
+            GL.UseProgram(0);
         }
 
         public void SetVariable(string name, float x, float y, float z, float w) {
+            GL.UseProgram(id);
 
+            int location = GetVariableLocation(name);
+
+            if (location != -1)
+                GL.Uniform4(location, x, y, z, w);
+
+            GL.UseProgram(0);
         }
 
         public void SetVariable(string name, Vector2 vec2) {
@@ -235,8 +352,17 @@ namespace FrameworkGL
         }
 
         public void SetVariable(string name, Matrix4 mat4) {
+            GL.UseProgram(id);
 
+            int location = GetVariableLocation(name);
+
+            if (location != -1)
+                GL.UniformMatrix4(location, false, ref mat4);
+
+            GL.UseProgram(0);
         }
+
+        #endregion
 
         #endregion
     }
