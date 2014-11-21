@@ -101,7 +101,7 @@ namespace FrameworkGL
         }
 
         public void AddColor(Color color) {
-            this.AddColor(new Vector4(color.R / 255, color.G / 255, color.B / 255, color.A / 255));
+            this.AddColor(new Vector4((float)color.R / 255.0f, (float)color.G / 255.0f, (float)color.B / 255.0f, (float)color.A / 255.0f));
         }
 
         public void AddTexCoord(Vector2 texCoord) {
@@ -210,7 +210,7 @@ namespace FrameworkGL
 
             if (hasColors) {
                 GL.BindBuffer(BufferTarget.ArrayBuffer, colorBuffer);
-                GL.VertexAttribPointer((int)Shader.ArrayIndex.VertexColor, 3, VertexAttribPointerType.Float, false, 0, 0);
+                GL.VertexAttribPointer((int)Shader.ArrayIndex.VertexColor, 4, VertexAttribPointerType.Float, false, 0, 0);
             }
 
             if (hasNormals) {

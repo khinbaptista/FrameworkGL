@@ -245,7 +245,7 @@ namespace FrameworkGL
             GL.GetProgramInfoLog(id, out info);
             GL.GetProgram(id, GetProgramParameterName.LinkStatus, out statusCode);
 
-            if (statusCode != -1) {
+            if (statusCode != 1) {
                 GL.DeleteProgram(id);
                 throw new Exception("Error linking program.\r\nStatus code: " + statusCode + " > " + info);
             }
