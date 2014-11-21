@@ -8,30 +8,30 @@ namespace FrameworkGL
 {
     class MeshData
     {
-        public List<VertexUnit> vertices { get; private set; }
-        public List<uint> indices { get; private set; }
+        public List<VertexUnit> Vertices { get; private set; }
+        public List<uint> Indices { get; private set; }
 
         public MeshData() {
-            vertices = new List<VertexUnit>();
-            indices = new List<uint>();
+            Vertices = new List<VertexUnit>();
+            Indices = new List<uint>();
         }
 
         public void AddVertexUnit(VertexUnit unit) {
             bool add = true;
             int i = 0;
 
-            while (add == true && i < vertices.Count) {
-                if (vertices[i] == unit) {
+            while (add == true && i < Vertices.Count) {
+                if (Vertices[i] == unit) {
                     add = false;
-                    indices.Add((uint)i);
+                    Indices.Add((uint)i);
                 }
 
                 i++;
             }
 
             if (add) {
-                vertices.Add(unit);
-                indices.Add((uint)vertices.Count - 1);
+                Vertices.Add(unit);
+                Indices.Add((uint)Vertices.Count - 1);
             }
         }
     }
