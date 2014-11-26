@@ -47,7 +47,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camera.cs" />
-    <Compile Include="GameElement.cs" />
     <Compile Include="GameMain.cs" />
     <Compile Include="InputManager.cs" />
     <Compile Include="Mesh\Mesh.cs" />

@@ -86,7 +86,7 @@ namespace FrameworkGL
             }
         }
 
-        public Matrix4 Model {
+        public Matrix4 ModelMatrix {
             get { return modelMatrix; }
             set {
                 modelMatrix = value;
