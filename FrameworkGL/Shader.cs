@@ -60,6 +60,21 @@ namespace FrameworkGL
 
         #endregion
 
+        #region Presets
+
+        public static Shader Shader2D {
+            get {
+                Shader shader2d = new Shader();
+                shader2d.AddShaderFile(ShaderType.VertexShader, @"GLSL\vs_2d.glsl");
+                shader2d.AddShaderFile(ShaderType.FragmentShader, @"GLSL\fs_texture.glsl");
+                shader2d.Link();
+
+                return shader2d;
+            }
+        }
+
+        #endregion
+
         #region Properties
 
         public static bool IsSupported {

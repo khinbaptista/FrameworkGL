@@ -19,6 +19,9 @@ namespace FrameworkGL
         public static Camera ActiveCamera { get; protected set; }
         public static float DeltaTime { get; protected set; }
 
+        Camera camera2d;
+        Sprite sprite;
+        Font2D font;
         Shader shader;
         Mesh triangle;
         Mesh floor;

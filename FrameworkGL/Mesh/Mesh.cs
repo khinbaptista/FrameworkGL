@@ -142,6 +142,10 @@ namespace FrameworkGL
             indices.Add(index);
         }
 
+        public void AddIndices(IEnumerable<uint> indices) {
+            this.indices.AddRange(indices);
+        }
+
         #endregion
 
         public void SetUp() {
