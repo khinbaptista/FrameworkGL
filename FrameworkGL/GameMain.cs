@@ -46,19 +46,16 @@ namespace FrameworkGL
             Window = new Rectangle(Location.X, Location.Y, Width, Height);
             DeltaTime = 0.0f;
             ActiveCamera = new Camera(new Vector3(0, 0.5f, 1f), -Vector3.UnitZ, Vector3.UnitY);
-            ActiveCamera.ProjectionMatrix = Matrix4.Identity;
+            //ActiveCamera.ProjectionMatrix = Matrix4.Identity;
 
             input = new InputManager();
 
-            shader = new Shader();
-            shader.AddShaderFile(ShaderType.VertexShader, @"GLSL\vs_mvp.glsl");
-            shader.AddShaderFile(ShaderType.FragmentShader, @"GLSL\fs_color.glsl");
-            shader.Link();
+            shader = Shader.Color;
 
-            //shader.TransformationMatrix = ActiveCamera.CameraMatrix;
+            shader.TransformationMatrix = ActiveCamera.CameraMatrix;
             //shader.TransformationMatrix = Matrix4.Identity;
-            shader.CameraMatrix = ActiveCamera.CameraMatrix;
-            shader.ModelMatrix = Matrix4.Identity;
+            //shader.CameraMatrix = ActiveCamera.CameraMatrix;
+            //shader.ModelMatrix = Matrix4.Identity;
             
             GL.PointSize(5f);
             

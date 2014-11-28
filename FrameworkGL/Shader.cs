@@ -35,6 +35,7 @@ namespace FrameworkGL
         public string NameOf_ViewMatrix;
 
         public string NameOf_CameraMatrix;
+        public string NameOf_ModelViewMatrix;
         public string NameOf_MvpMatrix;
 
         public string NameOf_VertexPosition;
@@ -62,14 +63,25 @@ namespace FrameworkGL
 
         #region Presets
 
-        public static Shader Shader2D {
+        public static Shader FixedLight {
             get {
-                Shader shader2d = new Shader();
-                shader2d.AddShaderFile(ShaderType.VertexShader, @"GLSL\vs_2d.glsl");
-                shader2d.AddShaderFile(ShaderType.FragmentShader, @"GLSL\fs_texture.glsl");
-                shader2d.Link();
+                Shader shader = new Shader();
+                shader.AddShaderFile(ShaderType.VertexShader, @"GLSL\vs_normal");
+                shader.AddShaderFile(ShaderType.FragmentShader, @"GLSL\fs_fixedLight.glsl");
+                shader.Link();
 
-                return shader2d;
+                return shader;
+            }
+        }
+
+        public static Shader Color {
+            get {
+                Shader shader = new Shader();
+                shader.AddShaderFile(ShaderType.VertexShader, @"GLSL\vs_mvp_color.glsl");
+                shader.AddShaderFile(ShaderType.FragmentShader, @"GLSL\fs_color.glsl");
+                shader.Link();
+
+                return shader;
             }
         }
 
@@ -172,6 +184,7 @@ namespace FrameworkGL
             NameOf_ViewMatrix = "view_matrix";
 
             NameOf_CameraMatrix = "camera_matrix";
+            NameOf_ModelViewMatrix = "modelview_matrix";
             NameOf_MvpMatrix = "mvp_matrix";
 
             NameOf_VertexPosition = "vertex_position";

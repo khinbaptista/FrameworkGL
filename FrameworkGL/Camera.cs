@@ -44,7 +44,7 @@ namespace FrameworkGL
         }
 
         public Matrix4 CameraMatrix {
-            get { return _projection * _view; }
+            get { return _view * _projection; }
         }
 
         /// <summary>

@@ -77,7 +77,7 @@ namespace FrameworkGL
         #region Methods
 
         public Sprite(Rectangle position, int layer = 2) {
-            this.shader = Shader.Shader2D;
+            //this.shader = Shader.Shader2D;
             canvas = new Mesh();
 
             this.Position = new Vector2(position.X, position.Y);

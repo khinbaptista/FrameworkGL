@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camera.cs" />
+    <Compile Include="Font2D.cs" />
     <Compile Include="GameMain.cs" />
     <Compile Include="InputManager.cs" />
     <Compile Include="Mesh\Mesh.cs" />
