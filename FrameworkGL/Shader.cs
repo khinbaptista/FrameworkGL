@@ -35,6 +35,7 @@ namespace FrameworkGL
         public string NameOf_ViewMatrix;
 
         public string NameOf_CameraMatrix;
+        public string NameOf_ModelViewMatrix;
         public string NameOf_MvpMatrix;
 
         public string NameOf_VertexPosition;
@@ -52,11 +53,38 @@ namespace FrameworkGL
         private Matrix4 viewMatrix;
 
         private Matrix4 cameraMatrix;
+        private Matrix4 modelviewMatrix;
         private Matrix4 mvpMatrix;
 
         private int texture;
         private float alpha;
         private int bumpMap;
+
+        #endregion
+
+        #region Presets
+
+        public static Shader FixedLight {
+            get {
+                Shader shader = new Shader();
+                shader.AddShaderFile(ShaderType.VertexShader, @"GLSL\vs_normal");
+                shader.AddShaderFile(ShaderType.FragmentShader, @"GLSL\fs_fixedLight.glsl");
+                shader.Link();
+
+                return shader;
+            }
+        }
+
+        public static Shader Color {
+            get {
+                Shader shader = new Shader();
+                shader.AddShaderFile(ShaderType.VertexShader, @"GLSL\vs_mvp_color.glsl");
+                shader.AddShaderFile(ShaderType.FragmentShader, @"GLSL\fs_color.glsl");
+                shader.Link();
+
+                return shader;
+            }
+        }
 
         #endregion
 
@@ -70,7 +98,7 @@ namespace FrameworkGL
             return shader.id;
         }
 
-        public Matrix4 Projection {
+        public Matrix4 ProjectionMatrix {
             get { return projectionMatrix; }
             set {
                 projectionMatrix = value;
@@ -78,7 +106,7 @@ namespace FrameworkGL
             }
         }
 
-        public Matrix4 View {
+        public Matrix4 ViewMatrix {
             get { return viewMatrix; }
             set {
                 viewMatrix = value;
@@ -86,7 +114,7 @@ namespace FrameworkGL
             }
         }
 
-        public Matrix4 Model {
+        public Matrix4 ModelMatrix {
             get { return modelMatrix; }
             set {
                 modelMatrix = value;
@@ -99,6 +127,14 @@ namespace FrameworkGL
             set {
                 cameraMatrix = value;
                 SetVariable(NameOf_CameraMatrix, cameraMatrix);
+            }
+        }
+
+        public Matrix4 ModelviewMatrix {
+            get { return modelviewMatrix; }
+            set {
+                modelviewMatrix = value;
+                SetVariable(NameOf_ModelViewMatrix, modelviewMatrix);
             }
         }
 
@@ -157,6 +193,7 @@ namespace FrameworkGL
             NameOf_ViewMatrix = "view_matrix";
 
             NameOf_CameraMatrix = "camera_matrix";
+            NameOf_ModelViewMatrix = "modelview_matrix";
             NameOf_MvpMatrix = "mvp_matrix";
 
             NameOf_VertexPosition = "vertex_position";

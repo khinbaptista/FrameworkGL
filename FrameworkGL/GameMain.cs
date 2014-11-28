@@ -41,17 +41,14 @@ namespace FrameworkGL
             DeltaTime = 0.0f;
             ActiveCamera = new Camera(new Vector3(0, 0, 10), new Vector3(0, 0, -1), Vector3.UnitY);
 
-            shader = new Shader();
-            shader.AddShaderFile(ShaderType.VertexShader, @"GLSL\vs_mvp.glsl");
-            shader.AddShaderFile(ShaderType.FragmentShader, @"GLSL\fs_color.glsl");
-            shader.Link();
+            shader = Shader.Color;
 
-            shader.TransformationMatrix = Matrix4.Identity;
+            shader.TransformationMatrix = ActiveCamera.CameraMatrix;
 
             triangle = new Mesh();
-            triangle.AddVertex(new Vector3(-0.3f, -0.2f, 0.0f));
-            triangle.AddVertex(new Vector3(0.0f, 0.3f, 0.0f));
-            triangle.AddVertex(new Vector3(0.3f, -0.2f, 0.0f));
+            triangle.AddVertex(new Vector3(-3f, -2f, 0.0f));
+            triangle.AddVertex(new Vector3(0.0f, 3f, 0.0f));
+            triangle.AddVertex(new Vector3(3f, -2f, 0.0f));
             triangle.AddColor(Color.Brown);
             triangle.AddColor(Color.BurlyWood);
             triangle.AddColor(Color.Chocolate);
@@ -63,10 +60,22 @@ namespace FrameworkGL
 
             if (e.Key == Key.Escape)
                 Exit();
-            else if (e.Key == Key.D)
-                shader.TransformationMatrix *= Matrix4.CreateTranslation(0.5f * DeltaTime, 0.0f, 0.0f);
-            else if (e.Key == Key.A)
-                shader.TransformationMatrix *= Matrix4.CreateTranslation(-0.5f * DeltaTime, 0.0f, 0.0f);
+            else if (e.Key == Key.D) {
+                ActiveCamera.RotateFromMouse(new Vector2(-0.3f * DeltaTime, 0));
+                shader.TransformationMatrix = ActiveCamera.CameraMatrix;
+            }
+            else if (e.Key == Key.A) {
+                ActiveCamera.RotateFromMouse(new Vector2(0.3f * DeltaTime, 0));
+                shader.TransformationMatrix = ActiveCamera.CameraMatrix;
+            }
+            else if (e.Key == Key.W) {
+                ActiveCamera.RotateFromMouse(new Vector2(0, 0.3f * DeltaTime));
+                shader.TransformationMatrix = ActiveCamera.CameraMatrix;
+            }
+            else if (e.Key == Key.S) {
+                ActiveCamera.RotateFromMouse(new Vector2(0, -0.3f * DeltaTime));
+                shader.TransformationMatrix = ActiveCamera.CameraMatrix;
+            }
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e) {

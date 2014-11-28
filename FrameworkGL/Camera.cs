@@ -104,7 +104,7 @@ namespace FrameworkGL
         /// Gets a matrix loaded with both projection and view transformations
         /// </summary>
         public Matrix4 CameraMatrix {
-            get { return projection * view; }
+            get { return view * projection; }
         }
 
         #endregion
@@ -156,6 +156,11 @@ namespace FrameworkGL
 
         private void UpdateViewMatrix(){
             view = Matrix4.LookAt(position, target, up);
+        }
+
+        public void RotateFromMouse(Vector2 mouseMove) {
+            Vector3 newDir = Vector3.Transform(Direction, Matrix4.CreateRotationY(mouseMove.X));
+            Direction = Vector3.Transform(newDir, Matrix4.CreateRotationX(mouseMove.Y));
         }
 
         #endregion

@@ -38,9 +38,7 @@ namespace FrameworkGL
 
         #region Properties
 
-        public static implicit operator int(Mesh mesh) {
-            return mesh.id;
-        }
+        public static implicit operator int(Mesh mesh) { return mesh.id; }
 
         public List<Vector3> Vertices { get { return vertices; } }
 
