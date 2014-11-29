@@ -67,7 +67,7 @@ namespace FrameworkGL
         public static Shader FixedLight {
             get {
                 Shader shader = new Shader();
-                shader.AddShaderFile(ShaderType.VertexShader, @"GLSL\vs_normal");
+                shader.AddShaderFile(ShaderType.VertexShader, @"GLSL\vs_normal.glsl");
                 shader.AddShaderFile(ShaderType.FragmentShader, @"GLSL\fs_fixedLight.glsl");
                 shader.Link();
 

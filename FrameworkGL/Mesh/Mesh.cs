@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.IO;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
@@ -64,7 +65,7 @@ namespace FrameworkGL
             indices = new List<uint>();
         }
 
-        public Mesh(MeshData data) {
+        public Mesh(MeshData data) : this() {
             this.data = data;
             this.LoadData();
         }
@@ -226,6 +227,114 @@ namespace FrameworkGL
         }
 
         #endregion
+
+        public static Mesh FromFile(string filepath) {
+            List<Vector3> positions = new List<Vector3>();
+            List<Vector3> normals = new List<Vector3>();
+            List<Vector2> texCoords = new List<Vector2>();
+            StreamReader obj_file = new StreamReader(filepath);
+            MeshData vertex_data = new MeshData();
+            int[] faceParamsIndices = new int[3];
+
+            string line;
+            string[] tokens;
+            char[] splitchar = new char[] { ' ' };
+            char[] splitparamschar = new char[] { '/' };
+
+            while (!obj_file.EndOfStream) {
+                line = obj_file.ReadLine();
+
+                if (line == "" || line.StartsWith("#"))
+                    continue;
+
+                if (line.StartsWith("v ")) {
+                    tokens = line.Split(splitchar);
+
+                    if (tokens.Length != 4)
+                        throw new Exception("Invalid number of arguments for a vertex position.");
+
+                    Vector3 newVertex = new Vector3(float.Parse(tokens[1]), float.Parse(tokens[2]), float.Parse(tokens[3]));
+                    positions.Add(newVertex);
+
+                    continue;
+                }
+
+                if (line.StartsWith("vn ")) {
+                    tokens = line.Split(splitchar);
+
+                    if (tokens.Length != 4)
+                        throw new Exception("Invalid number of arguments for a vertex normal.");
+
+                    Vector3 newNormal = new Vector3(float.Parse(tokens[1]), float.Parse(tokens[2]), float.Parse(tokens[3]));
+                    normals.Add(newNormal);
+
+                    continue;
+                }
+
+                if (line.StartsWith("vt ")) {
+                    tokens = line.Split(splitchar);
+
+                    // Up to 4 arguments, only reads two
+                    Vector2 newUV = new Vector2(float.Parse(tokens[1]), float.Parse(tokens[2]));
+                    texCoords.Add(newUV);
+
+                    continue;
+                }
+
+                if (line.StartsWith("f ")) {
+                    tokens = line.Split(splitchar);
+
+                    if (tokens.Length != 4)
+                        throw new Exception("Invalid number of arguments for a face. Only triangles are supported.");
+
+                    string[] values;
+                    List<uint> faceIndexes = new List<uint>();
+
+                    for (int i = 1; i < 4; i++) {
+                        values = tokens[i].Split(splitparamschar);
+
+                        if (values.Length != 3)
+                            throw new Exception("Wrong number of parameters for a triangle face.");
+
+                        for (int param = 0; param < 3; param++) {
+                            if (values[param] != "")
+                                faceParamsIndices[param] = int.Parse(values[param]) - 1;
+                            else
+                                faceParamsIndices[param] = -1;
+                        }
+
+                        Vector3 vertexPosition = positions[faceParamsIndices[0]];
+                        Vector3 vertexNormal;
+                        Vector2 vertexTexCoord;
+
+                        if (faceParamsIndices[2] >= 0)
+                            vertexNormal = normals[faceParamsIndices[2]];
+                        else
+                            vertexNormal = Vector3.Zero;
+
+                        if (faceParamsIndices[1] >= 0)
+                            vertexTexCoord = texCoords[faceParamsIndices[1]];
+                        else
+                            vertexTexCoord = new Vector2(-1, -1);
+
+                        VertexUnit unit = new VertexUnit(vertexPosition, vertexNormal, vertexTexCoord);
+
+                        vertex_data.AddVertexUnit(unit);
+                    }
+
+                    continue;
+                }
+
+                // if line starts with anything else, just ignore it for now (g, v, s, o, mtllib, usemtl...)
+            }
+
+            obj_file.Close();
+
+            Mesh mesh = new Mesh(vertex_data);
+            mesh.SetUp();
+
+            return mesh;
+        }
 
         #endregion
     }

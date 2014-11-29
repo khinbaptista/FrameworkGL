@@ -36,7 +36,10 @@ namespace FrameworkGL
         /// </summary>
         public virtual Quaternion Rotation {
             get { return rotation; }
-            set { rotation = value; }
+            set {
+                rotation = value;
+                MovementDirection = Vector3.Transform(movementDirection, rotation);
+            }
         }
 
         /// <summary>
@@ -80,10 +83,19 @@ namespace FrameworkGL
         /// Moves this element using MovementDirection and LinearSpeed
         /// </summary>
         /// <param name="smooth">Whether or not to take delta time into account</param>
-        public virtual void Move(bool smooth = true) {
+        public virtual void Move(bool backwards = false, bool smooth = true) {
             float multiplier = smooth ? GameMain.DeltaTime : 1.0f;
+            Vector3 finalDirection = backwards ? (-movementDirection) : movementDirection;
 
-            Position += movementDirection * linearSpeed * multiplier;
+            Position += finalDirection * linearSpeed * multiplier;
+        }
+
+        public virtual void MoveSideways(bool left, bool smooth = true) {
+            float multiplier = smooth ? GameMain.DeltaTime : 1.0f;
+            Vector3 finalDirection = left ? -Vector3.UnitX : Vector3.UnitX;
+            finalDirection = Vector3.Transform(finalDirection, rotation);
+
+            Position += finalDirection * linearSpeed * multiplier;
         }
 
         /// <summary>

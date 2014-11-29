@@ -52,6 +52,15 @@ namespace FrameworkGL
             }
         }
 
+        public Vector3 AbsolutePosition {
+            get { return position; }
+            set {
+                Vector3 moved = value - position;
+                base.Position = value;
+                Target += moved;
+            }
+        }
+
         /// <summary>
         /// Gets or sets the up vector of the camera
         /// </summary>
@@ -72,8 +81,8 @@ namespace FrameworkGL
             }
             set {
                 base.Rotation = value;
-                target = Vector3.Transform(target, value);
-                Up = Vector3.Transform(up, value);
+                //up = Vector3.Transform(up, value);
+                Direction = Vector3.Transform(Direction, value);
             }
         }
 
@@ -127,7 +136,7 @@ namespace FrameworkGL
             UpdateViewMatrix();
 
             if (projectionType == ProjectionType.Perspective)
-                this.projection = Matrix4.CreatePerspectiveFieldOfView((float)MathHelper.DegreesToRadians(90.0), (float)(16 / 9), 0.1f, 100.0f);
+                this.projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45.0f), (float)(16 / 9), 0.1f, 100.0f);
             else if (projectionType == ProjectionType.Orthographic)
                 this.projection = Matrix4.CreateOrthographic(16, 9, 0.1f, 100.0f);
         }
@@ -159,8 +168,29 @@ namespace FrameworkGL
         }
 
         public void RotateFromMouse(Vector2 mouseMove) {
-            Vector3 newDir = Vector3.Transform(Direction, Matrix4.CreateRotationY(mouseMove.X));
-            Direction = Vector3.Transform(newDir, Matrix4.CreateRotationX(mouseMove.Y));
+            Quaternion rotation = Quaternion.FromAxisAngle(Vector3.Transform(Vector3.UnitY, this.rotation), mouseMove.X);
+            rotation *= Quaternion.FromAxisAngle(Vector3.Transform(Vector3.UnitX, this.rotation), mouseMove.Y);
+
+            Rotation = rotation;
+        }
+
+        public override void Move(bool backwards = false, bool smooth = true) {
+            base.Move(backwards, smooth);
+            
+            float multiplier = smooth ? GameMain.DeltaTime : 1.0f;
+            Vector3 finalDirection = backwards ? -movementDirection : movementDirection;
+
+            Target = target + (finalDirection * linearSpeed * multiplier);
+        }
+
+        public override void MoveSideways(bool left, bool smooth = true) {
+            base.MoveSideways(left, smooth);
+
+            float multiplier = smooth ? GameMain.DeltaTime : 1.0f;
+            Vector3 finalDirection = left ? -Vector3.UnitX : Vector3.UnitX;
+            finalDirection = Vector3.Transform(finalDirection, rotation);
+
+            Target = target + finalDirection * linearSpeed * multiplier;
         }
 
         #endregion

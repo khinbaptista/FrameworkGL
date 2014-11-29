@@ -33,6 +33,9 @@ namespace FrameworkGL
         private int playerIndex;
         private readonly float threshold;
 
+        private Vector2 CenterScreen;
+        public Vector2 MouseMovement;
+
         #endregion
 
         #region Properties
@@ -45,6 +48,8 @@ namespace FrameworkGL
             get { return gamepad; }
         }
 
+        public bool UseMouse { get; set; }
+
         #endregion
 
         #region Methods
@@ -54,7 +59,7 @@ namespace FrameworkGL
         /// </summary>
         /// <param name="playerIndex">Index of the player to update</param>
         /// <param name="buttonThreshold">Threshold value for triggers and thumbsticks</param>
-        public InputManager(int playerIndex = 0, float buttonThreshold = 0.1f) {
+        public InputManager(bool useMouse = false, int playerIndex = 0, float buttonThreshold = 0.1f) {
             if (playerIndex < 0 || playerIndex >= 4)
                 throw new ArgumentException("Player Index must be between 0 and 3");
             if (buttonThreshold < 0 || buttonThreshold > 1)
@@ -64,6 +69,13 @@ namespace FrameworkGL
             threshold = buttonThreshold;
 
             inputs = new List<Input>();
+
+            UseMouse = useMouse;
+
+            if (useMouse) {
+                CenterScreen = new Vector2(GameMain.Viewport.X + GameMain.Viewport.Width / 2, GameMain.Viewport.Y + GameMain.Viewport.Height / 2);
+                Mouse.SetPosition(CenterScreen.X, CenterScreen.Y);
+            }
         }
 
         public virtual void Update() {
@@ -111,6 +123,17 @@ namespace FrameworkGL
                 inputs.Add(Input.Start);
             if (gamepad.Buttons.Back == ButtonState.Pressed)
                 inputs.Add(Input.Back);
+
+            // Updates mouse
+            if (UseMouse) {
+                MouseState mouse = Mouse.GetCursorState();
+                //MouseMovement = new Vector2(mouse.X, mouse.Y) - CenterScreen;
+                //MouseMovement.Y = -MouseMovement.Y;
+
+                MouseMovement = CenterScreen - new Vector2(mouse.X, mouse.Y);
+
+                Mouse.SetPosition(CenterScreen.X, CenterScreen.Y);
+            }
         }
 
         public bool Pressed(Input input) {

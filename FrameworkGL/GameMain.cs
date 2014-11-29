@@ -15,12 +15,13 @@ namespace FrameworkGL
     {
         #region Static attributes
 
-        public static Vector2 Viewport { get; protected set; }
+        public static Rectangle Viewport { get; protected set; }
         public static Camera ActiveCamera { get; protected set; }
         public static float DeltaTime { get; protected set; }
 
+        InputManager input;
         Shader shader;
-        Mesh triangle;
+        Mesh model;
 
         #endregion
 
@@ -36,23 +37,32 @@ namespace FrameworkGL
             base.OnLoad(e);
 
             GL.ClearColor(Color.Black);
+            GL.Enable(EnableCap.DepthTest);// | EnableCap.CullFace);
+            
 
-            Viewport = new Vector2(Width, Height);
+            Viewport = new Rectangle(Location.X, Location.Y, Width, Height);
             DeltaTime = 0.0f;
             ActiveCamera = new Camera(new Vector3(0, 0, 10), new Vector3(0, 0, -1), Vector3.UnitY);
+            ActiveCamera.LinearSpeed = 3.0f;
 
-            shader = Shader.Color;
+            input = new InputManager(true);
+            CursorVisible = false;
 
+            shader = Shader.FixedLight;
             shader.TransformationMatrix = ActiveCamera.CameraMatrix;
+            /*
+            model = new Mesh();
+            model.AddVertex(new Vector3(-3f, -2f, 0.0f));
+            model.AddVertex(new Vector3(0.0f, 3f, 0.0f));
+            model.AddVertex(new Vector3(3f, -2f, 0.0f));
+            model.AddColor(Color.Brown);
+            model.AddColor(Color.BurlyWood);
+            model.AddColor(Color.Chocolate);
+            model.SetUp();*/
 
-            triangle = new Mesh();
-            triangle.AddVertex(new Vector3(-3f, -2f, 0.0f));
-            triangle.AddVertex(new Vector3(0.0f, 3f, 0.0f));
-            triangle.AddVertex(new Vector3(3f, -2f, 0.0f));
-            triangle.AddColor(Color.Brown);
-            triangle.AddColor(Color.BurlyWood);
-            triangle.AddColor(Color.Chocolate);
-            triangle.SetUp();
+            model = Mesh.FromFile(@"obj\monkey.obj");
+
+            shader.ModelviewMatrix = ActiveCamera.ViewMatrix;
         }
 
         protected override void OnKeyDown(KeyboardKeyEventArgs e) {
@@ -60,36 +70,50 @@ namespace FrameworkGL
 
             if (e.Key == Key.Escape)
                 Exit();
-            else if (e.Key == Key.D) {
-                ActiveCamera.RotateFromMouse(new Vector2(-0.3f * DeltaTime, 0));
-                shader.TransformationMatrix = ActiveCamera.CameraMatrix;
-            }
-            else if (e.Key == Key.A) {
-                ActiveCamera.RotateFromMouse(new Vector2(0.3f * DeltaTime, 0));
-                shader.TransformationMatrix = ActiveCamera.CameraMatrix;
-            }
-            else if (e.Key == Key.W) {
-                ActiveCamera.RotateFromMouse(new Vector2(0, 0.3f * DeltaTime));
-                shader.TransformationMatrix = ActiveCamera.CameraMatrix;
-            }
-            else if (e.Key == Key.S) {
-                ActiveCamera.RotateFromMouse(new Vector2(0, -0.3f * DeltaTime));
-                shader.TransformationMatrix = ActiveCamera.CameraMatrix;
-            }
+        }
+
+        private void HandleInput() {
+            float cameraSpeed = 3.0f;
+
+            if (input.MouseMovement != Vector2.Zero)
+                ActiveCamera.RotateFromMouse(input.MouseMovement * DeltaTime * 0.01f);
+
+            if (input.FromKeyboard.IsKeyDown(Key.Q))
+                ActiveCamera.AbsolutePosition += Vector3.UnitY * DeltaTime * cameraSpeed;
+
+            if (input.FromKeyboard.IsKeyDown(Key.E))
+                ActiveCamera.AbsolutePosition -= Vector3.UnitY * DeltaTime * cameraSpeed;
+
+            if (input.FromKeyboard.IsKeyDown(Key.W))
+                ActiveCamera.Move();
+
+            if (input.FromKeyboard.IsKeyDown(Key.S))
+                ActiveCamera.Move(true);
+
+            if (input.FromKeyboard.IsKeyDown(Key.A))
+                ActiveCamera.MoveSideways(true);
+
+            if (input.FromKeyboard.IsKeyDown(Key.D))
+                ActiveCamera.MoveSideways(false);
+
+            shader.TransformationMatrix = ActiveCamera.CameraMatrix;
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e) {
             base.OnUpdateFrame(e);
 
             DeltaTime = (float)e.Time;
+            
+            input.Update();
+            HandleInput();
         }
 
         protected override void OnRenderFrame(FrameEventArgs e) {
             base.OnRenderFrame(e);
-            GL.Clear(ClearBufferMask.ColorBufferBit);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             shader.Activate();
-            triangle.Draw();
+            model.Draw();
             shader.Deactivate();
 
             SwapBuffers();
