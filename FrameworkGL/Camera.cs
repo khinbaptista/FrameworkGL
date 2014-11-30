@@ -80,9 +80,9 @@ namespace FrameworkGL
                 return base.Rotation;
             }
             set {
-                base.Rotation = value;
+                base.Rotation = value.Normalized();
                 //up = Vector3.Transform(up, value);
-                Direction = Vector3.Transform(Direction, value);
+                Direction = Vector3.Transform(Direction, Rotation);
             }
         }
 
@@ -172,6 +172,8 @@ namespace FrameworkGL
             rotation *= Quaternion.FromAxisAngle(Vector3.Transform(Vector3.UnitX, this.rotation), mouseMove.Y);
 
             Rotation = rotation;
+
+            angleXZ += mouseMove;
         }
 
         public override void Move(bool backwards = false, bool smooth = true) {

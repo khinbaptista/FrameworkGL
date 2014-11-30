@@ -64,6 +64,27 @@ namespace FrameworkGL
 
         #region Presets
 
+        /// <summary>
+        /// Colours pixels using color vectors.
+        /// Inputs: vec3 vertex_position | vec2 vertex_color
+        /// Uniforms: mat4 mvp_matrix
+        /// </summary>
+        public static Shader Color {
+            get {
+                Shader shader = new Shader();
+                shader.AddShaderFile(ShaderType.VertexShader, @"GLSL\vs_mvp_color.glsl");
+                shader.AddShaderFile(ShaderType.FragmentShader, @"GLSL\fs_color.glsl");
+                shader.Link();
+
+                return shader;
+            }
+        }
+
+        /// <summary>
+        /// Colours pixels using one fixed light, based on a normal vertex.
+        /// Inputs: vec3 vertex_position | vec3 vertex_normal
+        /// Normals: mat4 mvp_matrix | mat4 modelview_matrix
+        /// </summary>
         public static Shader FixedLight {
             get {
                 Shader shader = new Shader();
@@ -75,11 +96,16 @@ namespace FrameworkGL
             }
         }
 
-        public static Shader Color {
+        /// <summary>
+        /// Colours pixels based on a texture file.
+        /// Inputs: vec3 vertex_position | vec3 vertex_texCoord
+        /// Uniforms: mat4 mvp_matrix | sampler2D texture_sampler
+        /// </summary>
+        public static Shader Textured {
             get {
                 Shader shader = new Shader();
-                shader.AddShaderFile(ShaderType.VertexShader, @"GLSL\vs_mvp_color.glsl");
-                shader.AddShaderFile(ShaderType.FragmentShader, @"GLSL\fs_color.glsl");
+                shader.AddShaderFile(ShaderType.VertexShader, @"GLSL\vs_mvp_texture.glsl");
+                shader.AddShaderFile(ShaderType.FragmentShader, @"GLSL\fs_texture.glsl");
                 shader.Link();
 
                 return shader;

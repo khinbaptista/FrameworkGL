@@ -21,6 +21,7 @@ namespace FrameworkGL
 
         InputManager input;
         Shader shader;
+        Shader shader2d;
         Mesh model;
 
         #endregion
@@ -38,6 +39,8 @@ namespace FrameworkGL
 
             GL.ClearColor(Color.Black);
             GL.Enable(EnableCap.DepthTest);// | EnableCap.CullFace);
+            GL.Enable(EnableCap.Blend); GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+            GL.PointSize(10.0f);
             
 
             Viewport = new Rectangle(Location.X, Location.Y, Width, Height);
@@ -50,6 +53,9 @@ namespace FrameworkGL
 
             shader = Shader.FixedLight;
             shader.TransformationMatrix = ActiveCamera.CameraMatrix;
+
+            shader2d = Shader.Textured;
+            shader2d.TransformationMatrix = Matrix4.Identity;
             /*
             model = new Mesh();
             model.AddVertex(new Vector3(-3f, -2f, 0.0f));
@@ -70,6 +76,9 @@ namespace FrameworkGL
 
             if (e.Key == Key.Escape)
                 Exit();
+
+            if (e.Key == Key.P)
+                model.DrawAsPoints = !model.DrawAsPoints;
         }
 
         private void HandleInput() {

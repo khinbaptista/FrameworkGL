@@ -12,6 +12,7 @@ namespace FrameworkGL
         #region Attributes
 
         protected Vector3 position;
+        protected Vector2 angleXZ;
         protected Quaternion rotation;
 
         protected float linearSpeed;
@@ -37,7 +38,7 @@ namespace FrameworkGL
         public virtual Quaternion Rotation {
             get { return rotation; }
             set {
-                rotation = value;
+                rotation = value.Normalized();
                 MovementDirection = Vector3.Transform(movementDirection, rotation);
             }
         }
@@ -90,11 +91,12 @@ namespace FrameworkGL
             Position += finalDirection * linearSpeed * multiplier;
         }
 
+        // IS PROBLEMATIC AND I'M TIRED NOW
         public virtual void MoveSideways(bool left, bool smooth = true) {
             float multiplier = smooth ? GameMain.DeltaTime : 1.0f;
             Vector3 finalDirection = left ? -Vector3.UnitX : Vector3.UnitX;
-            finalDirection = Vector3.Transform(finalDirection, rotation);
-
+            finalDirection = Vector3.Transform(finalDirection, Matrix4.CreateRotationY(angleXZ.X));
+            finalDirection = Vector3.Transform(finalDirection, Matrix4.CreateRotationX(angleXZ.Y));
             Position += finalDirection * linearSpeed * multiplier;
         }
 

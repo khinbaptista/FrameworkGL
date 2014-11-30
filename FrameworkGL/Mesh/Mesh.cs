@@ -51,6 +51,8 @@ namespace FrameworkGL
 
         public List<uint> Indices { get { return indices; } }
 
+        public bool DrawAsPoints = false;
+
         #endregion
 
         #region Methods
@@ -193,9 +195,9 @@ namespace FrameworkGL
             if (hasTexCoords) GL.EnableVertexAttribArray((int)Shader.ArrayIndex.VertexTexCoord);
 
             if (isIndexed)
-                GL.DrawElements(BeginMode.Triangles, indices.Count, DrawElementsType.UnsignedInt, 0);
+                GL.DrawElements((DrawAsPoints ? BeginMode.Points : BeginMode.Triangles), indices.Count, DrawElementsType.UnsignedInt, 0);
             else
-                GL.DrawArrays(PrimitiveType.Triangles, 0, vertices.Count);
+                GL.DrawArrays((DrawAsPoints ? PrimitiveType.Points : PrimitiveType.Triangles), 0, vertices.Count);
 
             GL.DisableVertexAttribArray(0);
             GL.DisableVertexAttribArray(1);
