@@ -152,7 +152,7 @@ namespace FrameworkGL
         private void LoadArrayBuffer(int buffer, Vector2[] data) {
             GL.BindBuffer(BufferTarget.ArrayBuffer, buffer);
             GL.BufferData(BufferTarget.ArrayBuffer, new IntPtr(data.Length * Vector2.SizeInBytes), data, BufferUsageHint.StaticDraw);
-
+            
             // Clean up
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
         }

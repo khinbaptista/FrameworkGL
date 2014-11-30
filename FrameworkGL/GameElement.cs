@@ -91,7 +91,11 @@ namespace FrameworkGL
             Position += finalDirection * linearSpeed * multiplier;
         }
 
-        // IS PROBLEMATIC AND I'M TIRED NOW
+        /// <summary>
+        /// Moves the object sideways
+        /// </summary>
+        /// <param name="left">True to go left; False to go right</param>
+        /// <param name="smooth">Whether to use delta time or not</param>
         public virtual void MoveSideways(bool left, bool smooth = true) {
             float multiplier = smooth ? GameMain.DeltaTime : 1.0f;
             Vector3 finalDirection = left ? -Vector3.UnitX : Vector3.UnitX;
