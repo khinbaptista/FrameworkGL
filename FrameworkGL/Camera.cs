@@ -190,7 +190,7 @@ namespace FrameworkGL
 
             float multiplier = smooth ? GameMain.DeltaTime : 1.0f;
             Vector3 finalDirection = left ? -Vector3.UnitX : Vector3.UnitX;
-            finalDirection = Vector3.Transform(finalDirection, rotation);
+            finalDirection = Vector3.Transform(finalDirection, Matrix4.CreateRotationY(angleXZ.X));
 
             Target = target + finalDirection * linearSpeed * multiplier;
         }
