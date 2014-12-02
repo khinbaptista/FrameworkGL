@@ -238,6 +238,7 @@ namespace FrameworkGL
             MeshData vertex_data = new MeshData();
             int[] faceParamsIndices = new int[3];
 
+            int lineCount = 0;
             string line;
             string[] tokens;
             char[] splitchar = new char[] { ' ' };
@@ -245,7 +246,7 @@ namespace FrameworkGL
 
             while (!obj_file.EndOfStream) {
                 line = obj_file.ReadLine();
-
+                Console.WriteLine(lineCount++);
                 if (line == "" || line.StartsWith("#"))
                     continue;
 
@@ -331,6 +332,8 @@ namespace FrameworkGL
             }
 
             obj_file.Close();
+
+            Console.WriteLine("File closed: " + GameMain.stopwatch.Elapsed);
 
             Mesh mesh = new Mesh(vertex_data);
             mesh.SetUp();

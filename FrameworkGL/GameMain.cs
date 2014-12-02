@@ -9,6 +9,8 @@ using OpenTK.Graphics;
 using OpenTK.Input;
 using OpenTK.Graphics.OpenGL4;
 
+using System.Diagnostics; // Stopwatch for debugging
+
 namespace FrameworkGL
 {
     class GameMain : GameWindow
@@ -18,6 +20,8 @@ namespace FrameworkGL
         public static Rectangle Viewport { get; protected set; }
         public static Camera ActiveCamera { get; protected set; }
         public static float DeltaTime { get; protected set; }
+
+        public static Stopwatch stopwatch;
 
         InputManager input;
         Shader shader;
@@ -66,8 +70,13 @@ namespace FrameworkGL
             model.AddColor(Color.Chocolate);
             model.SetUp();*/
 
-            model = Mesh.FromFile(@"obj\monkey.obj");
+            stopwatch = new Stopwatch();
 
+            stopwatch.Start();
+            model = Mesh.FromFile(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + @"\obj\monkey.obj");
+            stopwatch.Stop();
+            Console.WriteLine("Total elapsed time since loading started: " + stopwatch.Elapsed.ToString());
+            
             shader.ModelviewMatrix = ActiveCamera.ViewMatrix;
         }
 

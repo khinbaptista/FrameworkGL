@@ -170,7 +170,7 @@ namespace FrameworkGL
         public void RotateFromMouse(Vector2 mouseMove) {
             angleXZ += mouseMove;
 
-            Quaternion rotation = Quaternion.FromAxisAngle(Vector3.Transform(Vector3.UnitY, Matrix4.CreateRotationX(angleXZ.Y)), mouseMove.X);
+            Quaternion rotation = Quaternion.FromAxisAngle(Vector3.Transform(Vector3.UnitY, this.rotation), mouseMove.X);
             rotation *= Quaternion.FromAxisAngle(Vector3.Transform(Vector3.UnitX, Matrix4.CreateRotationY(angleXZ.X)), mouseMove.Y);
 
             Rotation = rotation;
