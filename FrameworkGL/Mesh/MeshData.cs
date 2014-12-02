@@ -16,6 +16,11 @@ namespace FrameworkGL
             Indices = new List<uint>();
         }
 
+        public void AddVertexRepeat(VertexUnit unit) {
+            Vertices.Add(unit);
+            Indices.Add((uint)Vertices.Count - 1);
+        }
+
         public void AddVertexUnit(VertexUnit unit) {
             bool add = true;
             int i = 0;

@@ -13,18 +13,22 @@ namespace FrameworkGL
         public Vector3 position { get; private set; }
         public Vector3 normal { get; private set; }
         public Vector2 texCoord { get; private set; }
+        public Vector4 colour { get; private set; }
 
-        public VertexUnit(Vector3 position, Vector3 normal, Vector2 texCoord) {
+        public VertexUnit(Vector3 position, Vector3 normal, Vector2 texCoord, Vector4 colour) {
             this.position = position;
             this.normal = normal;
             this.texCoord = texCoord;
+            this.colour = colour;
         }
 
         public static bool operator ==(VertexUnit a, VertexUnit b) {
             return
                 a.position == b.position &&
                 a.normal == b.normal &&
-                a.texCoord == b.texCoord;
+                a.texCoord == b.texCoord &&
+                a.colour == b.colour;
+
         }
 
         public static bool operator !=(VertexUnit a, VertexUnit b) {

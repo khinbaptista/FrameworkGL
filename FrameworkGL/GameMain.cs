@@ -44,7 +44,7 @@ namespace FrameworkGL
             GL.ClearColor(Color.Black);
             GL.Enable(EnableCap.DepthTest);// | EnableCap.CullFace);
             GL.Enable(EnableCap.Blend); GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-            GL.PointSize(10.0f);
+            GL.PointSize(5.0f);
             
 
             Viewport = new Rectangle(Location.X, Location.Y, Width, Height);
@@ -58,7 +58,7 @@ namespace FrameworkGL
             shader = Shader.FixedLight;
             shader.TransformationMatrix = ActiveCamera.CameraMatrix;
 
-            shader2d = Shader.Textured;
+            shader2d = Shader.FixedLight;
             shader2d.TransformationMatrix = Matrix4.Identity;
             /*
             model = new Mesh();
@@ -73,7 +73,7 @@ namespace FrameworkGL
             stopwatch = new Stopwatch();
 
             stopwatch.Start();
-            model = Mesh.FromFile(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + @"\obj\monkey.obj");
+            model = Mesh.FromFileFast(@"obj\dragonFix.obj");
             stopwatch.Stop();
             Console.WriteLine("Total elapsed time since loading started: " + stopwatch.Elapsed.ToString());
             
