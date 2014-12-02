@@ -67,7 +67,8 @@ namespace FrameworkGL
             indices = new List<uint>();
         }
 
-        public Mesh(MeshData data) : this() {
+        public Mesh(MeshData data)
+            : this() {
             this.data = data;
             this.LoadData();
         }
@@ -232,6 +233,8 @@ namespace FrameworkGL
         }
 
         #endregion
+
+        #region Load from file
 
         public static Mesh FromFileFast(string filepath) {
             List<Vector3> positions = new List<Vector3>();
@@ -483,6 +486,8 @@ namespace FrameworkGL
 
             return mesh;
         }
+
+        #endregion
 
         #endregion
     }

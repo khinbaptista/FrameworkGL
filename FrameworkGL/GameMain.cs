@@ -26,7 +26,8 @@ namespace FrameworkGL
         InputManager input;
         Shader shader;
         Shader shader2d;
-        Mesh model;
+        Model dragon;
+        Model monkey;
 
         #endregion
 
@@ -73,10 +74,14 @@ namespace FrameworkGL
             stopwatch = new Stopwatch();
 
             stopwatch.Start();
-            model = Mesh.FromFileFast(@"obj\dragonFix.obj");
+            dragon = new Model(@"obj\dragonFix.obj", true); //Mesh.FromFileFast(@"obj\dragonFix.obj");
             stopwatch.Stop();
             Console.WriteLine("Total elapsed time since loading started: " + stopwatch.Elapsed.ToString());
+            dragon.Scale = 0.7f;
             
+            monkey = new Model(@"obj\monkey.obj");
+            monkey.Position = new Vector3(10, 0, -5);
+            monkey.Scale = 1.5f;
             shader.ModelviewMatrix = ActiveCamera.ViewMatrix;
         }
 
@@ -87,7 +92,7 @@ namespace FrameworkGL
                 Exit();
 
             if (e.Key == Key.P)
-                model.DrawAsPoints = !model.DrawAsPoints;
+                dragon.TogglePoints();
         }
 
         private void HandleInput() {
@@ -113,8 +118,6 @@ namespace FrameworkGL
 
             if (input.FromKeyboard.IsKeyDown(Key.D))
                 ActiveCamera.MoveSideways(false);
-
-            shader.TransformationMatrix = ActiveCamera.CameraMatrix;
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e) {
@@ -124,14 +127,24 @@ namespace FrameworkGL
             
             input.Update();
             HandleInput();
+
+            //shader.ModelviewMatrix = ActiveCamera.ViewMatrix;
+            monkey.Rotation *= Quaternion.FromAxisAngle(Vector3.One, DeltaTime * 0.5f);
+            dragon.Rotation *= Quaternion.FromAxisAngle(Vector3.UnitY, DeltaTime * 0.5f);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e) {
             base.OnRenderFrame(e);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
+            shader.TransformationMatrix = dragon.ModelMatrix * ActiveCamera.CameraMatrix;
             shader.Activate();
-            model.Draw();
+            dragon.Draw();
+            shader.Deactivate();
+
+            shader.TransformationMatrix = monkey.ModelMatrix * ActiveCamera.CameraMatrix;
+            shader.Activate();
+            monkey.Draw();
             shader.Deactivate();
 
             SwapBuffers();
