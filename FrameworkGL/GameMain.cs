@@ -20,6 +20,7 @@ namespace FrameworkGL
         public static Rectangle Viewport { get; protected set; }
         public static Camera ActiveCamera { get; protected set; }
         public static float DeltaTime { get; protected set; }
+        public static readonly bool useMouse = true;
 
         public static Stopwatch stopwatch;
 
@@ -30,7 +31,6 @@ namespace FrameworkGL
         Model monkey;
 
         #endregion
-
 
         #region Methods
 
@@ -53,8 +53,8 @@ namespace FrameworkGL
             ActiveCamera = new Camera(new Vector3(0, 0, 10), new Vector3(0, 0, -1), Vector3.UnitY);
             ActiveCamera.LinearSpeed = 3.0f;
 
-            input = new InputManager(true);
-            CursorVisible = false;
+            input = new InputManager(useMouse);
+            CursorVisible = !useMouse;
 
             shader = Shader.FixedLight;
             shader.TransformationMatrix = ActiveCamera.CameraMatrix;
@@ -74,7 +74,7 @@ namespace FrameworkGL
             stopwatch = new Stopwatch();
 
             stopwatch.Start();
-            dragon = new Model(@"obj\dragonFix.obj", true); //Mesh.FromFileFast(@"obj\dragonFix.obj");
+            dragon = new Model(@"obj\dragonFix.obj");
             stopwatch.Stop();
             Console.WriteLine("Total elapsed time since loading started: " + stopwatch.Elapsed.ToString());
             dragon.Scale = 0.7f;
@@ -152,6 +152,9 @@ namespace FrameworkGL
 
         protected override void OnResize(EventArgs e) {
             base.OnResize(e);
+
+            GL.Viewport(0, 0, Width, Height);
+            ActiveCamera.ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45), (float)Width / (float)Height, 0.1f, 100.0f);
         }
 
         #endregion

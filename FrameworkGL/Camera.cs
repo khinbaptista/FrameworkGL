@@ -136,7 +136,7 @@ namespace FrameworkGL
             UpdateViewMatrix();
 
             if (projectionType == ProjectionType.Perspective)
-                this.projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45.0f), (float)(16 / 9), 0.1f, 100.0f);
+                this.projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45.0f), 16f / 9f, 0.1f, 100.0f);
             else if (projectionType == ProjectionType.Orthographic)
                 this.projection = Matrix4.CreateOrthographic(16, 9, 0.1f, 100.0f);
         }

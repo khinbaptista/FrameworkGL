@@ -30,12 +30,8 @@ namespace FrameworkGL
         }
 
         public Model(string filepath, bool fast = true) {
-            if (fast)
-                Mesh = Mesh.FromFileFast(filepath);
-            else
-                Mesh = Mesh.FromFile(filepath);
-
             InitializeValues();
+            Mesh = Mesh.FromFile(filepath, fast);
         }
 
         private void InitializeValues() {
