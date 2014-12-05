@@ -74,10 +74,6 @@ namespace FrameworkGL
         
         public Sprite(Rectangle position, int layer = 2)
         {
-            this.Position = new Vector2(position.X, position.Y);
-            this.DepthLayer = layer;
-            this.dimensions = new Vector2(position.Width, position.Height);
-
             originalUVs = new Vector2[4];
             originalUVs[0] = new Vector2(0, 0);
             originalUVs[1] = new Vector2(1, 0);
@@ -88,7 +84,24 @@ namespace FrameworkGL
             foreach (Vector2 v in originalUVs)
                 UVs.Add(v);
 
-            this.UpdateCanvas();
+
+            Mesh mesh = new Mesh();
+            mesh.AddVertex(new Vector3(0, 0, layer));
+            mesh.AddTexCoord(UVs[0]);
+            mesh.AddVertex(new Vector3(dimensions.X, 0, layer));
+            mesh.AddTexCoord(UVs[1]);
+            mesh.AddVertex(new Vector3(0, -dimensions.Y, layer));
+            mesh.AddTexCoord(UVs[2]);
+            mesh.AddVertex(new Vector3(dimensions.X, -dimensions.Y, layer));
+            mesh.AddTexCoord(UVs[3]);
+            mesh.AddIndices(new uint[] { 0, 1, 2, 2, 1, 3 });
+            mesh.SetUp();
+
+            canvas = new Model(mesh);
+
+            this.Position = new Vector2(position.X, position.Y);
+            this.DepthLayer = layer;
+            this.dimensions = new Vector2(position.Width, position.Height);
         }
 
         private void UpdateCanvas()

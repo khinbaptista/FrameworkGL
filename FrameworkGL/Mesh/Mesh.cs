@@ -207,10 +207,10 @@ namespace FrameworkGL
             else
                 GL.DrawArrays((DrawAsPoints ? PrimitiveType.Points : PrimitiveType.Triangles), 0, vertices.Count);
 
-            GL.DisableVertexAttribArray(0);
-            GL.DisableVertexAttribArray(1);
-            GL.DisableVertexAttribArray(2);
-            GL.DisableVertexAttribArray(3);
+            GL.DisableVertexAttribArray((int)Shader.ArrayIndex.VertexPosition);
+            GL.DisableVertexAttribArray((int)Shader.ArrayIndex.VertexColor);
+            GL.DisableVertexAttribArray((int)Shader.ArrayIndex.VertexNormal);
+            GL.DisableVertexAttribArray((int)Shader.ArrayIndex.VertexTexCoord);
         }
 
         public void BindBuffers() {
@@ -359,8 +359,6 @@ namespace FrameworkGL
             }
 
             obj_file.Close();
-
-            Console.WriteLine("File closed: " + GameMain.stopwatch.Elapsed);
 
             Mesh mesh = new Mesh(vertex_data);
             mesh.SetUp();

@@ -9,8 +9,6 @@ using OpenTK.Graphics;
 using OpenTK.Input;
 using OpenTK.Graphics.OpenGL4;
 
-using System.Diagnostics; // Stopwatch for debugging
-
 namespace FrameworkGL
 {
     class GameMain : GameWindow
@@ -19,16 +17,13 @@ namespace FrameworkGL
 
         public static Rectangle Viewport { get; protected set; }
         public static Camera ActiveCamera { get; protected set; }
+        public static Camera HudCamera { get; protected set; }
         public static float DeltaTime { get; protected set; }
-        public static readonly bool useMouse = true;
-
-        public static Stopwatch stopwatch;
+        public static readonly bool useMouse = false;
 
         InputManager input;
         Shader shader;
-        Shader shader2d;
-        Model dragon;
-        Model monkey;
+        Sprite sprite;
 
         #endregion
 
@@ -42,47 +37,41 @@ namespace FrameworkGL
         protected override void OnLoad(EventArgs e) {
             base.OnLoad(e);
 
-            GL.ClearColor(Color.Black);
-            GL.Enable(EnableCap.DepthTest);// | EnableCap.CullFace);
-            GL.Enable(EnableCap.Blend); GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-            GL.PointSize(5.0f);
-            
-
+            WindowBorder = WindowBorder.Resizable;
             Viewport = new Rectangle(Location.X, Location.Y, Width, Height);
             DeltaTime = 0.0f;
+
+            GL.Enable(EnableCap.DepthTest);// | EnableCap.CullFace);
+            GL.Enable(EnableCap.Blend); GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+            GL.ClearColor(Color.WhiteSmoke);
+            GL.PointSize(2.0f);
+
             ActiveCamera = new Camera(new Vector3(0, 0, 10), new Vector3(0, 0, -1), Vector3.UnitY);
             ActiveCamera.LinearSpeed = 3.0f;
+            HudCamera = Camera.New2D();
 
             input = new InputManager(useMouse);
             CursorVisible = !useMouse;
 
-            shader = Shader.FixedLight;
-            shader.TransformationMatrix = ActiveCamera.CameraMatrix;
-
-            shader2d = Shader.FixedLight;
-            shader2d.TransformationMatrix = Matrix4.Identity;
+            shader = Shader.Textured;
+            shader.TransformationMatrix = HudCamera.CameraMatrix;
+            
             /*
-            model = new Mesh();
+            Mesh model = new Mesh();
             model.AddVertex(new Vector3(-3f, -2f, 0.0f));
             model.AddVertex(new Vector3(0.0f, 3f, 0.0f));
             model.AddVertex(new Vector3(3f, -2f, 0.0f));
-            model.AddColor(Color.Brown);
-            model.AddColor(Color.BurlyWood);
-            model.AddColor(Color.Chocolate);
-            model.SetUp();*/
-
-            stopwatch = new Stopwatch();
-
-            stopwatch.Start();
-            dragon = new Model(@"obj\dragonFix.obj");
-            stopwatch.Stop();
-            Console.WriteLine("Total elapsed time since loading started: " + stopwatch.Elapsed.ToString());
-            dragon.Scale = 0.7f;
+            model.AddTexCoord(new Vector2(0.0f, 0.0f));
+            model.AddTexCoord(new Vector2(0.5f, 1.0f));
+            model.AddTexCoord(new Vector2(1.0f, 0.0f));
+            model.AddIndices(new uint[] { 1, 2, 3 });
+            model.SetUp();
+            triangle = new Model(model);
+            */
             
-            monkey = new Model(@"obj\monkey.obj");
-            monkey.Position = new Vector3(10, 0, -5);
-            monkey.Scale = 1.5f;
-            shader.ModelviewMatrix = ActiveCamera.ViewMatrix;
+            sprite = new Sprite(new Rectangle(0, Height, 256, 256));
+            sprite.Texture = new Texture(@"img\Courier.png");
+            shader.Texture = sprite.Texture;
         }
 
         protected override void OnKeyDown(KeyboardKeyEventArgs e) {
@@ -91,8 +80,8 @@ namespace FrameworkGL
             if (e.Key == Key.Escape)
                 Exit();
 
-            if (e.Key == Key.P)
-                dragon.TogglePoints();
+            //if (e.Key == Key.P)
+                //dragon.TogglePoints();
         }
 
         private void HandleInput() {
@@ -127,24 +116,14 @@ namespace FrameworkGL
             
             input.Update();
             HandleInput();
-
-            //shader.ModelviewMatrix = ActiveCamera.ViewMatrix;
-            monkey.Rotation *= Quaternion.FromAxisAngle(Vector3.One, DeltaTime * 0.5f);
-            dragon.Rotation *= Quaternion.FromAxisAngle(Vector3.UnitY, DeltaTime * 0.5f);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e) {
             base.OnRenderFrame(e);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-            shader.TransformationMatrix = dragon.ModelMatrix * ActiveCamera.CameraMatrix;
+            
             shader.Activate();
-            dragon.Draw();
-            shader.Deactivate();
-
-            shader.TransformationMatrix = monkey.ModelMatrix * ActiveCamera.CameraMatrix;
-            shader.Activate();
-            monkey.Draw();
+            sprite.Draw();
             shader.Deactivate();
 
             SwapBuffers();

@@ -9,11 +9,6 @@ namespace FrameworkGL
 {
     class Camera : GameElement
     {
-        public enum ProjectionType : byte
-        {
-            Orthographic = 0,
-            Perspective = 1
-        }
 
         #region Attributes
 
@@ -127,26 +122,21 @@ namespace FrameworkGL
         /// <param name="eye">Position of the camera</param>
         /// <param name="target">Target of the camera</param>
         /// <param name="up">Orientation of the camera</param>
-        /// <param name="projectionType">Type of projection to be created (can be changed later)</param>
-        public Camera(Vector3 eye, Vector3 target, Vector3 up, ProjectionType projectionType = ProjectionType.Perspective) {
+        public Camera(Vector3 eye, Vector3 target, Vector3 up) {
             this.position = eye;
             this.target = target;
             this.up = up;
 
             UpdateViewMatrix();
-
-            if (projectionType == ProjectionType.Perspective)
-                this.projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45.0f), 16f / 9f, 0.1f, 100.0f);
-            else if (projectionType == ProjectionType.Orthographic)
-                this.projection = Matrix4.CreateOrthographic(16, 9, 0.1f, 100.0f);
+            this.projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45.0f), 16f / 9f, 0.1f, 100.0f);
         }
 
         /// <summary>
         /// Instances a new camera
         /// </summary>
         public Camera(float eyeX, float eyeY, float eyeZ, float targetX, float targetY, float targetZ,
-            float upX, float upY, float upZ, ProjectionType projectionType = ProjectionType.Perspective)
-            : this(new Vector3(eyeX, eyeY, eyeZ), new Vector3(targetX, targetY, targetZ), new Vector3(upX, upY, upZ), projectionType) { }
+            float upX, float upY, float upZ)
+            : this(new Vector3(eyeX, eyeY, eyeZ), new Vector3(targetX, targetY, targetZ), new Vector3(upX, upY, upZ)) { }
 
         /// <summary>
         /// Creates a camera for 2D screen operations (like GUI/HUD or anything 2D) (respects OpenGL coordinate system)
@@ -155,8 +145,8 @@ namespace FrameworkGL
         /// <returns>Camera 2D</returns>
         public static Camera New2D(int layer = 10) {
             Camera camera2d = new Camera(new Vector3(0, 0, layer), -Vector3.UnitZ, Vector3.UnitY);
-            camera2d.position = new Vector3(GameMain.Viewport.X / 2, GameMain.Viewport.Y / 2, layer);
-            camera2d.projection = Matrix4.CreateOrthographic(GameMain.Viewport.X, GameMain.Viewport.Y, 0.1f, 100.0f);
+            camera2d.position = new Vector3(GameMain.Viewport.Width / 2, GameMain.Viewport.Height / 2, layer);
+            camera2d.projection = Matrix4.CreateOrthographic(GameMain.Viewport.Width, GameMain.Viewport.Height, 0.1f, 100.0f);
 
             camera2d.UpdateViewMatrix();
 
