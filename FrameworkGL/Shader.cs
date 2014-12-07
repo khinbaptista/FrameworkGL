@@ -45,7 +45,6 @@ namespace FrameworkGL
 
         public string NameOf_Texture;
         public string NameOf_Alpha;
-        public string NameOf_BumpMap;
 
         public string NameOf_CameraPosition;
         public string NameOf_MaterialKa;

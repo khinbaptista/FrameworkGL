@@ -50,6 +50,8 @@
     <Compile Include="GameElement.cs" />
     <Compile Include="GameMain.cs" />
     <Compile Include="InputManager.cs" />
+    <Compile Include="LightSource.cs" />
+    <Compile Include="Material.cs" />
     <Compile Include="Mesh\Mesh.cs" />
     <Compile Include="Mesh\MeshData.cs" />
     <Compile Include="Sprite.cs" />

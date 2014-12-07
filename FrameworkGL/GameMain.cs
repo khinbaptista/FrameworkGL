@@ -23,7 +23,7 @@ namespace FrameworkGL
 
         InputManager input;
         Shader shader;
-        Model triangle;
+        Model wall;
 
         #endregion
 
@@ -34,9 +34,17 @@ namespace FrameworkGL
                 VSync = VSyncMode.Adaptive;
         }
 
+        #region Initialization
+
         protected override void OnLoad(EventArgs e) {
             base.OnLoad(e);
 
+            Initialize();
+            CreateShader();
+            InitializeModel();
+        }
+
+        private void Initialize() {
             WindowBorder = WindowBorder.Hidden;
             Viewport = new Rectangle(Location.X, Location.Y, Width, Height);
             DeltaTime = 0.0f;
@@ -52,22 +60,20 @@ namespace FrameworkGL
 
             input = new InputManager(useMouse);
             CursorVisible = !useMouse;
+        }
 
+        private void CreateShader() {
             shader = Shader.Textured;
             shader.TransformationMatrix = ActiveCamera.CameraMatrix;
-            shader.Texture = new Texture(@"img\Courier.png");
-            
+            shader.Texture = new Texture(@"img\gradientGB.png");
+        }
+
+        private void InitializeModel() {
             Mesh model = new Mesh();
             model.AddVertex(new Vector3(-1.0f, 0.0f, 0.0f));
             model.AddVertex(new Vector3(-1.0f, 2.0f, 0.0f));
             model.AddVertex(new Vector3(1f, 0.0f, 0.0f));
             model.AddVertex(new Vector3(1.0f, 2.0f, 0.0f));
-            /*
-            model.AddTexCoord(new Vector2(0.0f, 0.0f));
-            model.AddTexCoord(new Vector2(0.0f, 1.0f));
-            model.AddTexCoord(new Vector2(1.0f, 0.0f));
-            model.AddTexCoord(new Vector2(1.0f, 1.0f));*/
-
             model.AddTexCoord(new Vector2(0.0f, 1.0f));
             model.AddTexCoord(new Vector2(0.0f, 0.0f));
             model.AddTexCoord(new Vector2(1.0f, 1.0f));
@@ -75,18 +81,12 @@ namespace FrameworkGL
 
             model.AddIndices(new uint[] { 0, 1, 2, 1, 3, 2 });
             model.SetUp();
-            triangle = new Model(model);
+            wall = new Model(model);
         }
 
-        protected override void OnKeyDown(KeyboardKeyEventArgs e) {
-            base.OnKeyDown(e);
+        #endregion
 
-            if (e.Key == Key.Escape)
-                Exit();
-
-            //if (e.Key == Key.P)
-                //dragon.TogglePoints();
-        }
+        #region Game Loop
 
         private void HandleInput() {
             float cameraSpeed = 3.0f;
@@ -121,7 +121,7 @@ namespace FrameworkGL
             input.Update();
             HandleInput();
 
-            shader.TransformationMatrix = triangle.ModelMatrix * ActiveCamera.CameraMatrix;
+            shader.TransformationMatrix = wall.ModelMatrix * ActiveCamera.CameraMatrix;
         }
 
         protected override void OnRenderFrame(FrameEventArgs e) {
@@ -129,10 +129,24 @@ namespace FrameworkGL
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             
             shader.Activate();
-            triangle.Draw();
+            wall.Draw();
             shader.Deactivate();
 
             SwapBuffers();
+        }
+
+        #endregion
+
+        #region Events
+
+        protected override void OnKeyDown(KeyboardKeyEventArgs e) {
+            base.OnKeyDown(e);
+
+            if (e.Key == Key.Escape)
+                Exit();
+
+            //if (e.Key == Key.P)
+            //dragon.TogglePoints();
         }
 
         protected override void OnResize(EventArgs e) {
@@ -146,6 +160,10 @@ namespace FrameworkGL
 
         #endregion
 
+        #endregion
+
+        // Entry point
+        [STAThread]
         static void Main(string[] args) {
             using (var game = new GameMain()) {
                 game.Run(60.0);
