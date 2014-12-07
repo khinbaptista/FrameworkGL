@@ -45,6 +45,7 @@ namespace FrameworkGL
 
         public string NameOf_Texture;
         public string NameOf_Alpha;
+        public string NameOf_TextureAlpha;
 
         public string NameOf_CameraPosition;
         public string NameOf_MaterialKa;
@@ -66,6 +67,7 @@ namespace FrameworkGL
 
         private int texture;
         private float alpha;
+        private float textureAlpha;
 
         private Vector3 cameraPosition;
         private Vector3 materialKa;
@@ -203,7 +205,15 @@ namespace FrameworkGL
                 SetVariable(NameOf_Alpha, alpha);
             }
         }
-        
+
+        public float TextureAlpha {
+            get { return textureAlpha; }
+            set {
+                textureAlpha = value;
+                SetVariable(NameOf_TextureAlpha, value);
+            }
+        }
+
         public Vector3 CameraPosition {
             get { return cameraPosition; }
             set {
@@ -272,6 +282,8 @@ namespace FrameworkGL
                 MaterialKs = value.Specular;
                 MaterialShininness = value.Shininness;
                 Alpha = value.Alpha;
+                if (value.Texture != null)
+                    Texture = value.Texture;
             }
         }
 
@@ -316,6 +328,7 @@ namespace FrameworkGL
 
             NameOf_Texture = "texture_sampler";
             NameOf_Alpha = "alpha";
+            NameOf_TextureAlpha = "texture_alpha";
 
             NameOf_CameraPosition = "camera_position";
             NameOf_MaterialKa = "material_Ka";
@@ -337,6 +350,7 @@ namespace FrameworkGL
 
             texture = -1;
             alpha = 1.0f;
+            textureAlpha = 1.0f;
 
             cameraPosition = new Vector3();
             materialKa = new Vector3();

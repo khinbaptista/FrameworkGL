@@ -23,6 +23,8 @@ namespace FrameworkGL
 
         InputManager input;
         Shader shader;
+        LightSource light;
+        Material material;
         Model wall;
 
         #endregion
@@ -49,7 +51,8 @@ namespace FrameworkGL
             Viewport = new Rectangle(Location.X, Location.Y, Width, Height);
             DeltaTime = 0.0f;
 
-            GL.Enable(EnableCap.DepthTest);// | EnableCap.CullFace);
+            GL.Enable(EnableCap.DepthTest);
+            GL.Enable(EnableCap.CullFace); GL.FrontFace(FrontFaceDirection.Cw); GL.CullFace(CullFaceMode.Back);
             GL.Enable(EnableCap.Blend); GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
             GL.ClearColor(Color.PapayaWhip);
             GL.PointSize(2.0f);
@@ -63,9 +66,13 @@ namespace FrameworkGL
         }
 
         private void CreateShader() {
-            shader = Shader.Textured;
+            shader = new Shader();
+            shader.AddShaderFile(ShaderType.VertexShader, @"GLSL\vs_mvp_texture_normal.glsl");
+            shader.AddShaderFile(ShaderType.FragmentShader, @"GLSL\fs_phong_texture.glsl");
+            //shader.AddShaderFile(ShaderType.FragmentShader, @"GLSL\fs_phong.glsl");
+            shader.Link();
+
             shader.TransformationMatrix = ActiveCamera.CameraMatrix;
-            shader.Texture = new Texture(@"img\gradientGB.png");
         }
 
         private void InitializeModel() {
@@ -74,6 +81,10 @@ namespace FrameworkGL
             model.AddVertex(new Vector3(-1.0f, 2.0f, 0.0f));
             model.AddVertex(new Vector3(1f, 0.0f, 0.0f));
             model.AddVertex(new Vector3(1.0f, 2.0f, 0.0f));
+            model.AddNormal(Vector3.UnitZ);
+            model.AddNormal(Vector3.UnitZ);
+            model.AddNormal(Vector3.UnitZ);
+            model.AddNormal(Vector3.UnitZ);
             model.AddTexCoord(new Vector2(0.0f, 1.0f));
             model.AddTexCoord(new Vector2(0.0f, 0.0f));
             model.AddTexCoord(new Vector2(1.0f, 1.0f));
@@ -82,6 +93,19 @@ namespace FrameworkGL
             model.AddIndices(new uint[] { 0, 1, 2, 1, 3, 2 });
             model.SetUp();
             wall = new Model(model);
+
+            light = new LightSource(new Vector3(5, 5, 5), new Vector3(1f, 1f, 1f), new Vector3(0.1f, 0.1f, 0.1f));
+            material = new Material();
+            material.Alpha = 1.0f;
+            material.Texture = new Texture(@"img\gradientGB.png");
+            //material.Diffuse = new Vector3(0.0f, 0.8f, 0.0f);
+            material.Shininness = 3f;
+            material.Ambient = new Vector3(0.3f, 0.3f, 0.3f);
+            material.Specular = new Vector3(0.5f, 0.5f, 0.5f);
+            
+            shader.TextureAlpha = 0.5f;
+            shader.Material = material;
+            shader.Light = light;
         }
 
         #endregion
@@ -122,6 +146,7 @@ namespace FrameworkGL
             HandleInput();
 
             shader.TransformationMatrix = wall.ModelMatrix * ActiveCamera.CameraMatrix;
+            shader.CameraPosition = ActiveCamera.Position;
         }
 
         protected override void OnRenderFrame(FrameEventArgs e) {
