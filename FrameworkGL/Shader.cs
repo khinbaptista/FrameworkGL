@@ -47,6 +47,15 @@ namespace FrameworkGL
         public string NameOf_Alpha;
         public string NameOf_BumpMap;
 
+        public string NameOf_CameraPosition;
+        public string NameOf_MaterialKa;
+        public string NameOf_MaterialKd;
+        public string NameOf_MaterialKs;
+        public string NameOf_MaterialShininness;
+        public string NameOf_LightPosition;
+        public string NameOf_LightColour;
+        public string NameOf_AmbientLight;
+
         // Variable values
         private Matrix4 projectionMatrix;
         private Matrix4 modelMatrix;
@@ -58,7 +67,15 @@ namespace FrameworkGL
 
         private int texture;
         private float alpha;
-        private int bumpMap;
+
+        private Vector3 cameraPosition;
+        private Vector3 materialKa;
+        private Vector3 materialKd;
+        private Vector3 materialKs;
+        private float materialQ;
+        private Vector3 lightPosition;
+        private Vector3 lightColour;
+        private Vector3 ambientColour;
 
         #endregion
 
@@ -187,12 +204,83 @@ namespace FrameworkGL
                 SetVariable(NameOf_Alpha, alpha);
             }
         }
-
-        public int BumpMap {
-            get { return bumpMap; }
+        
+        public Vector3 CameraPosition {
+            get { return cameraPosition; }
             set {
-                bumpMap = value;
-                SetVariable(NameOf_BumpMap, bumpMap);
+                cameraPosition = value;
+                SetVariable(NameOf_CameraPosition, value);
+            }
+        }
+
+        public Vector3 MaterialKa {
+            get { return materialKa; }
+            set {
+                materialKa = value;
+                SetVariable(NameOf_MaterialKa, value);
+            }
+        }
+
+        public Vector3 MaterialKd {
+            get { return materialKd; }
+            set {
+                materialKd = value;
+                SetVariable(NameOf_MaterialKd, value);
+            }
+        }
+
+        public Vector3 MaterialKs {
+            get { return materialKs; }
+            set {
+                materialKs = value;
+                SetVariable(NameOf_MaterialKs, value);
+            }
+        }
+
+        public float MaterialShininness {
+            get { return materialQ; }
+            set { materialQ = value; }
+        }
+
+        public Vector3 LightPosition {
+            get { return lightPosition; }
+            set {
+                lightPosition = value;
+                SetVariable(NameOf_LightPosition, value);
+            }
+        }
+
+        public Vector3 LightColour {
+            get { return lightColour; }
+            set {
+                lightColour = value;
+                SetVariable(NameOf_LightColour, value);
+            }
+        }
+
+        public Vector3 AmbientColour {
+            get { return ambientColour; }
+            set {
+                ambientColour = value;
+                SetVariable(NameOf_AmbientLight, value);
+            }
+        }
+
+        public Material Material {
+            set {
+                MaterialKa = value.Ambient;
+                MaterialKd = value.Diffuse;
+                MaterialKs = value.Specular;
+                MaterialShininness = value.Shininness;
+                Alpha = value.Alpha;
+            }
+        }
+
+        public LightSource Light {
+            set {
+                LightPosition = value.Position;
+                LightColour = value.Colour;
+                AmbientColour = value.Ambient;
             }
         }
 
@@ -229,7 +317,15 @@ namespace FrameworkGL
 
             NameOf_Texture = "texture_sampler";
             NameOf_Alpha = "alpha";
-            NameOf_BumpMap = "bump_sampler";
+
+            NameOf_CameraPosition = "camera_position";
+            NameOf_MaterialKa = "material_Ka";
+            NameOf_MaterialKd = "material_Kd";
+            NameOf_MaterialKs = "material_Ks";
+            NameOf_MaterialShininness = "material_Q";
+            NameOf_LightPosition = "light_position";
+            NameOf_LightColour = "light_colour";
+            NameOf_AmbientLight = "ambient_colour";
         }
 
         private void InitializeVariableValues() {
@@ -242,7 +338,15 @@ namespace FrameworkGL
 
             texture = -1;
             alpha = 1.0f;
-            bumpMap = -1;
+
+            cameraPosition = new Vector3();
+            materialKa = new Vector3();
+            materialKd = new Vector3();
+            materialKs = new Vector3();
+            materialQ = 0;
+            lightPosition = new Vector3();
+            lightColour = new Vector3();
+            ambientColour = new Vector3();
         }
 
         /// <summary>

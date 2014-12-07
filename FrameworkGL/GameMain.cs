@@ -19,11 +19,11 @@ namespace FrameworkGL
         public static Camera ActiveCamera { get; protected set; }
         public static Camera HudCamera { get; protected set; }
         public static float DeltaTime { get; protected set; }
-        public static readonly bool useMouse = false;
+        public static readonly bool useMouse = true;
 
         InputManager input;
         Shader shader;
-        Sprite sprite;
+        Model triangle;
 
         #endregion
 
@@ -37,16 +37,16 @@ namespace FrameworkGL
         protected override void OnLoad(EventArgs e) {
             base.OnLoad(e);
 
-            WindowBorder = WindowBorder.Resizable;
+            WindowBorder = WindowBorder.Hidden;
             Viewport = new Rectangle(Location.X, Location.Y, Width, Height);
             DeltaTime = 0.0f;
 
             GL.Enable(EnableCap.DepthTest);// | EnableCap.CullFace);
             GL.Enable(EnableCap.Blend); GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-            GL.ClearColor(Color.WhiteSmoke);
+            GL.ClearColor(Color.PapayaWhip);
             GL.PointSize(2.0f);
 
-            ActiveCamera = new Camera(new Vector3(0, 0, 10), new Vector3(0, 0, -1), Vector3.UnitY);
+            ActiveCamera = new Camera(new Vector3(0, 0, 5), new Vector3(0, 0, -1), Vector3.UnitY);
             ActiveCamera.LinearSpeed = 3.0f;
             HudCamera = Camera.New2D();
 
@@ -54,24 +54,28 @@ namespace FrameworkGL
             CursorVisible = !useMouse;
 
             shader = Shader.Textured;
-            shader.TransformationMatrix = HudCamera.CameraMatrix;
+            shader.TransformationMatrix = ActiveCamera.CameraMatrix;
+            shader.Texture = new Texture(@"img\Courier.png");
             
-            /*
             Mesh model = new Mesh();
-            model.AddVertex(new Vector3(-3f, -2f, 0.0f));
-            model.AddVertex(new Vector3(0.0f, 3f, 0.0f));
-            model.AddVertex(new Vector3(3f, -2f, 0.0f));
+            model.AddVertex(new Vector3(-1.0f, 0.0f, 0.0f));
+            model.AddVertex(new Vector3(-1.0f, 2.0f, 0.0f));
+            model.AddVertex(new Vector3(1f, 0.0f, 0.0f));
+            model.AddVertex(new Vector3(1.0f, 2.0f, 0.0f));
+            /*
             model.AddTexCoord(new Vector2(0.0f, 0.0f));
-            model.AddTexCoord(new Vector2(0.5f, 1.0f));
+            model.AddTexCoord(new Vector2(0.0f, 1.0f));
             model.AddTexCoord(new Vector2(1.0f, 0.0f));
-            model.AddIndices(new uint[] { 1, 2, 3 });
+            model.AddTexCoord(new Vector2(1.0f, 1.0f));*/
+
+            model.AddTexCoord(new Vector2(0.0f, 1.0f));
+            model.AddTexCoord(new Vector2(0.0f, 0.0f));
+            model.AddTexCoord(new Vector2(1.0f, 1.0f));
+            model.AddTexCoord(new Vector2(1.0f, 0.0f));
+
+            model.AddIndices(new uint[] { 0, 1, 2, 1, 3, 2 });
             model.SetUp();
             triangle = new Model(model);
-            */
-            
-            sprite = new Sprite(new Rectangle(0, Height, 256, 256));
-            sprite.Texture = new Texture(@"img\Courier.png");
-            shader.Texture = sprite.Texture;
         }
 
         protected override void OnKeyDown(KeyboardKeyEventArgs e) {
@@ -116,6 +120,8 @@ namespace FrameworkGL
             
             input.Update();
             HandleInput();
+
+            shader.TransformationMatrix = triangle.ModelMatrix * ActiveCamera.CameraMatrix;
         }
 
         protected override void OnRenderFrame(FrameEventArgs e) {
@@ -123,7 +129,7 @@ namespace FrameworkGL
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             
             shader.Activate();
-            sprite.Draw();
+            triangle.Draw();
             shader.Deactivate();
 
             SwapBuffers();
@@ -131,6 +137,8 @@ namespace FrameworkGL
 
         protected override void OnResize(EventArgs e) {
             base.OnResize(e);
+
+            ClientRectangle = new Rectangle(0, 0, Width, Height);
 
             GL.Viewport(0, 0, Width, Height);
             ActiveCamera.ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45), (float)Width / (float)Height, 0.1f, 100.0f);
