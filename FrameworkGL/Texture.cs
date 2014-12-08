@@ -64,10 +64,16 @@ namespace FrameworkGL
 
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)minFilter);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)magFilter);
+
+            GL.BindTexture(TextureTarget.Texture2D, 0);
         }
 
         public void Bind() {
             GL.BindTexture(TextureTarget.Texture2D, ID);
+        }
+
+        public void Unbind() {
+            GL.BindTexture(TextureTarget.Texture2D, 0);
         }
 
         #endregion

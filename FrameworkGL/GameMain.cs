@@ -107,14 +107,15 @@ namespace FrameworkGL
             material.Shininness = 3f;
             material.Ambient = new Vector3(0.3f, 0.3f, 0.3f);
             material.Specular = new Vector3(0.5f, 0.5f, 0.5f);
+            wall.Material = material;
             
             shader.TextureAlpha = 1.0f;
-            shader.Material = material;
+            shader.Material = wall.Material;
             shader.Light = light;
 
             sprite = new Sprite(new Rectangle(0, Height, 256, 256));
-            //sprite.Texture = new Texture(@"img\Courier.png");
-            //shader2d.Texture = sprite.Texture;
+            sprite.Texture = new Texture(@"img\Courier.png");
+            shader2d.Texture = sprite.Texture;
         }
 
         #endregion
@@ -168,9 +169,9 @@ namespace FrameworkGL
             wall.Draw();
             shader.Deactivate();
 
-            //shader2d.Activate();
-            //sprite.Draw();
-            //shader2d.Deactivate();
+            shader2d.Activate();
+            sprite.Draw();
+            shader2d.Deactivate();
             
             SwapBuffers();
         }

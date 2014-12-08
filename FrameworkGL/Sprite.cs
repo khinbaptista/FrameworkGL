@@ -187,6 +187,7 @@ namespace FrameworkGL
 
             GL.BindTexture(TextureTarget.Texture2D, texture);
             canvas.Draw();
+            GL.BindTexture(TextureTarget.Texture2D, 0);
         }
 
         #endregion
