@@ -66,6 +66,10 @@ namespace FrameworkGL
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)magFilter);
         }
 
+        public void Bind() {
+            GL.BindTexture(TextureTarget.Texture2D, ID);
+        }
+
         #endregion
     }
 }

@@ -67,6 +67,10 @@ namespace FrameworkGL
             set { this.texture = value; }
         }
 
+        public Matrix4 ModelMatrix {
+            get { return canvas.ModelMatrix; }
+        }
+
         #endregion
 
 
@@ -84,6 +88,7 @@ namespace FrameworkGL
             foreach (Vector2 v in originalUVs)
                 UVs.Add(v);
 
+            this.dimensions = new Vector2(position.Width, position.Height);
 
             Mesh mesh = new Mesh();
             mesh.AddVertex(new Vector3(0, 0, layer));
@@ -101,7 +106,6 @@ namespace FrameworkGL
 
             this.Position = new Vector2(position.X, position.Y);
             this.DepthLayer = layer;
-            this.dimensions = new Vector2(position.Width, position.Height);
         }
 
         private void UpdateCanvas()

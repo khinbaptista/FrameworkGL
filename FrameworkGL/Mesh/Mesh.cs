@@ -270,7 +270,6 @@ namespace FrameworkGL
                             throw new Exception("Invalid number of arguments for a vertex position.");
                     }
 
-
                     Vector3 newVertex = new Vector3(float.Parse(tokens[1]), float.Parse(tokens[2]), float.Parse(tokens[3]));
 
                     Vector4 newColour;

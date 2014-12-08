@@ -22,6 +22,9 @@ namespace FrameworkGL
         public static readonly bool useMouse = true;
 
         InputManager input;
+        Shader shader2d;
+        Sprite sprite;
+
         Shader shader;
         LightSource light;
         Material material;
@@ -54,7 +57,7 @@ namespace FrameworkGL
             GL.Enable(EnableCap.DepthTest);
             GL.Enable(EnableCap.CullFace); GL.FrontFace(FrontFaceDirection.Cw); GL.CullFace(CullFaceMode.Back);
             GL.Enable(EnableCap.Blend); GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-            GL.ClearColor(Color.PapayaWhip);
+            GL.ClearColor(Color.WhiteSmoke);
             GL.PointSize(2.0f);
 
             ActiveCamera = new Camera(new Vector3(0, 0, 5), new Vector3(0, 0, -1), Vector3.UnitY);
@@ -73,6 +76,8 @@ namespace FrameworkGL
             shader.Link();
 
             shader.TransformationMatrix = ActiveCamera.CameraMatrix;
+
+            shader2d = Shader.Textured;
         }
 
         private void InitializeModel() {
@@ -94,7 +99,7 @@ namespace FrameworkGL
             model.SetUp();
             wall = new Model(model);
 
-            light = new LightSource(new Vector3(5, 5, 5), new Vector3(1f, 1f, 1f), new Vector3(0.1f, 0.1f, 0.1f));
+            light = new LightSource(new Vector3(5, 5, 5), new Vector3(1f, 1f, 1f), new Vector3(0.5f, 0.5f, 0.5f));
             material = new Material();
             material.Alpha = 1.0f;
             material.Texture = new Texture(@"img\gradientGB.png");
@@ -103,9 +108,13 @@ namespace FrameworkGL
             material.Ambient = new Vector3(0.3f, 0.3f, 0.3f);
             material.Specular = new Vector3(0.5f, 0.5f, 0.5f);
             
-            shader.TextureAlpha = 0.5f;
+            shader.TextureAlpha = 1.0f;
             shader.Material = material;
             shader.Light = light;
+
+            sprite = new Sprite(new Rectangle(0, Height, 256, 256));
+            //sprite.Texture = new Texture(@"img\Courier.png");
+            //shader2d.Texture = sprite.Texture;
         }
 
         #endregion
@@ -147,6 +156,8 @@ namespace FrameworkGL
 
             shader.TransformationMatrix = wall.ModelMatrix * ActiveCamera.CameraMatrix;
             shader.CameraPosition = ActiveCamera.Position;
+
+            shader2d.TransformationMatrix = sprite.ModelMatrix * HudCamera.CameraMatrix;
         }
 
         protected override void OnRenderFrame(FrameEventArgs e) {
@@ -157,6 +168,10 @@ namespace FrameworkGL
             wall.Draw();
             shader.Deactivate();
 
+            //shader2d.Activate();
+            //sprite.Draw();
+            //shader2d.Deactivate();
+            
             SwapBuffers();
         }
 

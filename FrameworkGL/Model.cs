@@ -13,6 +13,7 @@ namespace FrameworkGL
         public Vector3 Position;
         public Quaternion Rotation;
         public float Scale;
+        public Material material;
 
         public Matrix4 ModelMatrix {
             get {
@@ -41,6 +42,10 @@ namespace FrameworkGL
         }
 
         public void Draw() {
+            if (material != null)
+                if (material.Texture != null)
+                    material.Texture.Bind();
+
             Mesh.Draw();
         }
 
