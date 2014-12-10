@@ -130,6 +130,36 @@ namespace FrameworkGL
             }
         }
 
+        /// <summary>
+        /// Uses the Phong Illumination model
+        /// Requires a bunch of stuff - see source code
+        /// </summary>
+        public static Shader Phong {
+            get {
+                Shader shader = new Shader();
+                shader.AddShaderFile(ShaderType.VertexShader, @"GLSL\vs_mvp_texture_normal.glsl");
+                shader.AddShaderFile(ShaderType.FragmentShader, @"GLSL\fs_phong.glsl");
+                shader.Link();
+
+                return shader;
+            }
+        }
+
+        /// <summary>
+        /// Uses the Phong Illumination model, texturing the objects
+        /// Requires a bunch of stuff - see source code
+        /// </summary>
+        public static Shader PhongTextured {
+            get {
+                Shader shader = new Shader();
+                shader.AddShaderFile(ShaderType.VertexShader, @"GLSL\vs_mvp_texture_normal.glsl");
+                shader.AddShaderFile(ShaderType.FragmentShader, @"GLSL\fs_phong_texture.glsl");
+                shader.Link();
+
+                return shader;
+            }
+        }
+
         #endregion
 
         #region Properties

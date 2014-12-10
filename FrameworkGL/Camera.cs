@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
 using OpenTK;
 
 namespace FrameworkGL
@@ -31,6 +32,7 @@ namespace FrameworkGL
                 return base.Position;
             }
             set {
+                target += value - position;
                 base.Position = value;
                 UpdateViewMatrix();
             }
@@ -143,10 +145,11 @@ namespace FrameworkGL
         /// </summary>
         /// <param name="layer">Layer of the camera (position in the 3rd dimension)</param>
         /// <returns>Camera 2D</returns>
-        public static Camera New2D(int layer = 10) {
+        public static Camera New2D(Rectangle viewport, int layer = 10) {
+
             Camera camera2d = new Camera(new Vector3(0, 0, layer), -Vector3.UnitZ, Vector3.UnitY);
-            camera2d.position = new Vector3(GameMain.Viewport.Width / 2, GameMain.Viewport.Height / 2, layer);
-            camera2d.projection = Matrix4.CreateOrthographic(GameMain.Viewport.Width, GameMain.Viewport.Height, 0.1f, 100.0f);
+            camera2d.Position = new Vector3(viewport.Width / 2, viewport.Height / 2, layer);
+            camera2d.projection = Matrix4.CreateOrthographic(viewport.Width, viewport.Height, 0.1f, 100.0f);
 
             camera2d.UpdateViewMatrix();
 
@@ -164,25 +167,6 @@ namespace FrameworkGL
             rotation *= Quaternion.FromAxisAngle(Vector3.Transform(Vector3.UnitX, Matrix4.CreateRotationY(angleXZ.X)), mouseMove.Y);
 
             Rotation = rotation;
-        }
-
-        public override void Move(bool backwards = false, bool smooth = true) {
-            base.Move(backwards, smooth);
-            
-            float multiplier = smooth ? GameMain.DeltaTime : 1.0f;
-            Vector3 finalDirection = backwards ? -movementDirection : movementDirection;
-
-            Target = target + (finalDirection * linearSpeed * multiplier);
-        }
-
-        public override void MoveSideways(bool left, bool smooth = true) {
-            base.MoveSideways(left, smooth);
-
-            float multiplier = smooth ? GameMain.DeltaTime : 1.0f;
-            Vector3 finalDirection = left ? -Vector3.UnitX : Vector3.UnitX;
-            finalDirection = Vector3.Transform(finalDirection, Matrix4.CreateRotationY(angleXZ.X));
-
-            Target = target + finalDirection * linearSpeed * multiplier;
         }
 
         #endregion

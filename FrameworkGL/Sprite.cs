@@ -131,7 +131,7 @@ namespace FrameworkGL
             mesh.AddVertex(new Vector3(dimensions.X, -dimensions.Y, position.Z));
             mesh.AddTexCoord(UVs[3]);
 
-            mesh.AddIndices(new uint[] { 0, 1, 2, 2, 1, 3 });
+            mesh.AddIndices(new uint[] { 2, 1, 0, 3, 1, 2 });
             mesh.SetUp();
 
             canvas = new Model(mesh);

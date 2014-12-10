@@ -256,9 +256,12 @@ namespace FrameworkGL
             char[] splitchar = new char[] { ' ' };
             char[] splitparamschar = new char[] { '/' };
 
+            System.Diagnostics.Stopwatch timer = new System.Diagnostics.Stopwatch();
+            timer.Start();
+
             while (!obj_file.EndOfStream) {
                 line = obj_file.ReadLine();
-                Console.WriteLine(lineCount++);
+                Console.WriteLine("Reading line " + lineCount++);
                 if (line == "" || line.StartsWith("#"))
                     continue;
 
@@ -358,6 +361,8 @@ namespace FrameworkGL
             }
 
             obj_file.Close();
+            timer.Stop();
+            Console.WriteLine("Time spent loading " + Path.GetFileName(filepath) + ": " + timer.Elapsed);
 
             Mesh mesh = new Mesh(vertex_data);
             mesh.SetUp();

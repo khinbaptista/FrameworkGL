@@ -17,18 +17,21 @@ namespace FrameworkGL
 
         public static Rectangle Viewport { get; protected set; }
         public static Camera ActiveCamera { get; protected set; }
-        public static Camera HudCamera { get; protected set; }
         public static float DeltaTime { get; protected set; }
         public static readonly bool useMouse = true;
 
         InputManager input;
-        Shader shader2d;
-        Sprite sprite;
-
+        HUD hud;
         Shader shader;
-        LightSource light;
-        Material material;
+        Shader shaderTextured;
+        Model ground;
+
+        bool goPositive;
+        Model movingMonkey;
+
+        Model rotatingMonkey;
         Model wall;
+        Model dragon;
 
         #endregion
 
@@ -50,72 +53,71 @@ namespace FrameworkGL
         }
 
         private void Initialize() {
-            WindowBorder = WindowBorder.Hidden;
-            Viewport = new Rectangle(Location.X, Location.Y, Width, Height);
+            WindowBorder = WindowBorder.Resizable;
             DeltaTime = 0.0f;
+            Viewport = ClientRectangle;
 
             GL.Enable(EnableCap.DepthTest);
-            GL.Enable(EnableCap.CullFace); GL.FrontFace(FrontFaceDirection.Cw); GL.CullFace(CullFaceMode.Back);
+            GL.Enable(EnableCap.CullFace); GL.FrontFace(FrontFaceDirection.Ccw); GL.CullFace(CullFaceMode.Back);
             GL.Enable(EnableCap.Blend); GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
             GL.ClearColor(Color.WhiteSmoke);
             GL.PointSize(2.0f);
-
+            
             ActiveCamera = new Camera(new Vector3(0, 0, 5), new Vector3(0, 0, -1), Vector3.UnitY);
             ActiveCamera.LinearSpeed = 3.0f;
-            HudCamera = Camera.New2D();
-
+            
+            hud = new HUD(ClientRectangle);
+            
             input = new InputManager(useMouse);
             CursorVisible = !useMouse;
         }
 
         private void CreateShader() {
-            shader = new Shader();
-            shader.AddShaderFile(ShaderType.VertexShader, @"GLSL\vs_mvp_texture_normal.glsl");
-            shader.AddShaderFile(ShaderType.FragmentShader, @"GLSL\fs_phong_texture.glsl");
-            //shader.AddShaderFile(ShaderType.FragmentShader, @"GLSL\fs_phong.glsl");
-            shader.Link();
+            shader = Shader.Phong;
 
             shader.TransformationMatrix = ActiveCamera.CameraMatrix;
 
-            shader2d = Shader.Textured;
+            shaderTextured = Shader.PhongTextured;
         }
 
         private void InitializeModel() {
-            Mesh model = new Mesh();
-            model.AddVertex(new Vector3(-1.0f, 0.0f, 0.0f));
-            model.AddVertex(new Vector3(-1.0f, 2.0f, 0.0f));
-            model.AddVertex(new Vector3(1f, 0.0f, 0.0f));
-            model.AddVertex(new Vector3(1.0f, 2.0f, 0.0f));
-            model.AddNormal(Vector3.UnitZ);
-            model.AddNormal(Vector3.UnitZ);
-            model.AddNormal(Vector3.UnitZ);
-            model.AddNormal(Vector3.UnitZ);
-            model.AddTexCoord(new Vector2(0.0f, 1.0f));
-            model.AddTexCoord(new Vector2(0.0f, 0.0f));
-            model.AddTexCoord(new Vector2(1.0f, 1.0f));
-            model.AddTexCoord(new Vector2(1.0f, 0.0f));
+            movingMonkey = new Model(@"obj\monkey.obj");
+            dragon = new Model(@"obj\dragonFix.obj");
 
-            model.AddIndices(new uint[] { 0, 1, 2, 1, 3, 2 });
-            model.SetUp();
-            wall = new Model(model);
-
-            light = new LightSource(new Vector3(5, 5, 5), new Vector3(1f, 1f, 1f), new Vector3(0.5f, 0.5f, 0.5f));
-            material = new Material();
+            Material material = new Material();
             material.Alpha = 1.0f;
-            material.Texture = new Texture(@"img\gradientGB.png");
-            //material.Diffuse = new Vector3(0.0f, 0.8f, 0.0f);
-            material.Shininness = 3f;
-            material.Ambient = new Vector3(0.3f, 0.3f, 0.3f);
-            material.Specular = new Vector3(0.5f, 0.5f, 0.5f);
-            wall.Material = material;
-            
-            shader.TextureAlpha = 1.0f;
-            shader.Material = wall.Material;
-            shader.Light = light;
+            //material.Texture = new Texture(@"img\gradientGB.png");
+            material.Diffuse = new Vector3(0.75f, 0.1f, 0.1f);
+            material.Shininness = 50f;
+            material.Ambient = new Vector3(0.01f, 0.01f, 0.01f);
+            material.Specular = new Vector3(0.1f, 0.1f, 0.1f);
+            movingMonkey.Material = material;
 
-            sprite = new Sprite(new Rectangle(0, Height, 256, 256));
-            sprite.Texture = new Texture(@"img\Courier.png");
-            shader2d.Texture = sprite.Texture;
+            dragon.Material = material;
+            dragon.Position = new Vector3(15, -1, -10);
+
+            rotatingMonkey = new Model(movingMonkey.Mesh);
+            rotatingMonkey.Material = material;
+            rotatingMonkey.Position = new Vector3(5, 0, 0);
+
+            //shader.TextureAlpha = 1.0f;
+            shader.Material = movingMonkey.Material;
+            shader.Light = new LightSource(new Vector3(20, 20, 20), new Vector3(0.7f, 0.7f, 0.7f), new Vector3(0.5f, 0.5f, 0.5f));
+
+            wall = Model.Wall();
+            wall.Position = new Vector3(0, 0, -5);
+            wall.Material = material;
+            wall.Material.Texture = new Texture(@"img\gradientGB.png");
+
+            shaderTextured.TransformationMatrix = ActiveCamera.CameraMatrix;
+            shaderTextured.Material = wall.Material;
+            shaderTextured.Light = new LightSource(new Vector3(20, 20, 20), new Vector3(0.7f, 0.7f, 0.7f), new Vector3(0.5f, 0.5f, 0.5f));
+
+            ground = Model.Wall();
+            ground.Rotation = Quaternion.FromAxisAngle(Vector3.UnitX, MathHelper.DegreesToRadians(270f));
+            ground.Scale = 100;
+            ground.Position = new Vector3(0, -1, 40);
+            ground.Material = wall.Material;
         }
 
         #endregion
@@ -149,30 +151,58 @@ namespace FrameworkGL
 
         protected override void OnUpdateFrame(FrameEventArgs e) {
             base.OnUpdateFrame(e);
-
+            
             DeltaTime = (float)e.Time;
             
             input.Update();
             HandleInput();
 
-            shader.TransformationMatrix = wall.ModelMatrix * ActiveCamera.CameraMatrix;
-            shader.CameraPosition = ActiveCamera.Position;
+            if (goPositive) {
+                movingMonkey.Position += new Vector3(0, 1 * DeltaTime, 0);
+                if (movingMonkey.Position.Y > 5)
+                    goPositive = false;
+            }
+            else {
+                movingMonkey.Position -= new Vector3(0, 1 * DeltaTime, 0);
+                if (movingMonkey.Position.Y < 0)
+                    goPositive = true;
+            }
+            movingMonkey.Rotation *= Quaternion.FromAxisAngle(new Vector3(0, 1, 0), DeltaTime * -0.75f);
 
-            shader2d.TransformationMatrix = sprite.ModelMatrix * HudCamera.CameraMatrix;
+            rotatingMonkey.Rotation *= Quaternion.FromAxisAngle(Vector3.UnitY, DeltaTime * 0.5f);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e) {
             base.OnRenderFrame(e);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            
+
+            hud.Draw();
+
+            shader.TransformationMatrix = movingMonkey.ModelMatrix * ActiveCamera.CameraMatrix;
             shader.Activate();
-            wall.Draw();
+            movingMonkey.Draw();
             shader.Deactivate();
 
-            shader2d.Activate();
-            sprite.Draw();
-            shader2d.Deactivate();
-            
+            shader.TransformationMatrix = dragon.ModelMatrix * ActiveCamera.CameraMatrix;
+            shader.Activate();
+            dragon.Draw();
+            shader.Deactivate();
+
+            shader.TransformationMatrix = rotatingMonkey.ModelMatrix * ActiveCamera.CameraMatrix;
+            shader.Activate();
+            rotatingMonkey.Draw();
+            shader.Deactivate();
+
+            shaderTextured.TransformationMatrix = wall.ModelMatrix * ActiveCamera.CameraMatrix;
+            shaderTextured.Activate();
+            wall.Draw();
+            shaderTextured.Deactivate();
+
+            shaderTextured.TransformationMatrix = ground.ModelMatrix * ActiveCamera.CameraMatrix;
+            shaderTextured.Activate();
+            ground.Draw();
+            shaderTextured.Deactivate();
+
             SwapBuffers();
         }
 
@@ -186,14 +216,17 @@ namespace FrameworkGL
             if (e.Key == Key.Escape)
                 Exit();
 
-            //if (e.Key == Key.P)
-            //dragon.TogglePoints();
+            if (e.Key == Key.F)
+                Console.WriteLine("Frame rate: " + (float)RenderFrequency);
+
+            if (e.Key == Key.R){
+                ActiveCamera = new Camera(new Vector3(0, 0, 5), new Vector3(0, 0, -1), Vector3.UnitY);
+                ActiveCamera.LinearSpeed = 3.0f;
+            }
         }
 
         protected override void OnResize(EventArgs e) {
             base.OnResize(e);
-
-            ClientRectangle = new Rectangle(0, 0, Width, Height);
 
             GL.Viewport(0, 0, Width, Height);
             ActiveCamera.ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45), (float)Width / (float)Height, 0.1f, 100.0f);

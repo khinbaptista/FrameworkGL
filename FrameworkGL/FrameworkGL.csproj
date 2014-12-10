@@ -49,6 +49,7 @@
     <Compile Include="Camera.cs" />
     <Compile Include="GameElement.cs" />
     <Compile Include="GameMain.cs" />
+    <Compile Include="HUD.cs" />
     <Compile Include="InputManager.cs" />
     <Compile Include="LightSource.cs" />
     <Compile Include="Material.cs" />
