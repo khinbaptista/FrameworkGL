@@ -18,7 +18,9 @@ namespace FrameworkGL
         public static Rectangle Viewport { get; protected set; }
         public static Camera ActiveCamera { get; protected set; }
         public static float DeltaTime { get; protected set; }
-        public static readonly bool useMouse = true;
+        public static readonly bool useMouse = false;
+
+        float fps;
 
         InputManager input;
         HUD hud;
@@ -32,6 +34,7 @@ namespace FrameworkGL
         Model rotatingMonkey;
         Model wall;
         Model dragon;
+        Model pyramid;
 
         #endregion
 
@@ -56,6 +59,7 @@ namespace FrameworkGL
             WindowBorder = WindowBorder.Resizable;
             DeltaTime = 0.0f;
             Viewport = ClientRectangle;
+            fps = 0.0f;
 
             GL.Enable(EnableCap.DepthTest);
             GL.Enable(EnableCap.CullFace); GL.FrontFace(FrontFaceDirection.Ccw); GL.CullFace(CullFaceMode.Back);
@@ -96,6 +100,10 @@ namespace FrameworkGL
             dragon.Material = material;
             dragon.Position = new Vector3(15, -1, -10);
 
+            pyramid = new Model(@"obj\pyramid.obj");
+            pyramid.Material = material;
+            pyramid.Position = new Vector3(-3, 0, 0);
+
             rotatingMonkey = new Model(movingMonkey.Mesh);
             rotatingMonkey.Material = material;
             rotatingMonkey.Position = new Vector3(5, 0, 0);
@@ -125,7 +133,8 @@ namespace FrameworkGL
         #region Game Loop
 
         private void HandleInput() {
-            float cameraSpeed = 3.0f;
+            const float cameraSpeed = 3.0f;
+            const float meshSpeed = 5.0f;
 
             if (input.MouseMovement != Vector2.Zero)
                 ActiveCamera.RotateFromMouse(input.MouseMovement * DeltaTime * 0.01f);
@@ -147,6 +156,18 @@ namespace FrameworkGL
 
             if (input.FromKeyboard.IsKeyDown(Key.D))
                 ActiveCamera.MoveSideways(false);
+
+            if (input.FromKeyboard.IsKeyDown(Key.Up))
+                dragon.Position -= Vector3.UnitZ * DeltaTime * meshSpeed;
+
+            if (input.FromKeyboard.IsKeyDown(Key.Down))
+                dragon.Position += Vector3.UnitZ * DeltaTime * meshSpeed;
+
+            if (input.FromKeyboard.IsKeyDown(Key.Right))
+                dragon.Position += Vector3.UnitX * DeltaTime * meshSpeed;
+
+            if (input.FromKeyboard.IsKeyDown(Key.Left))
+                dragon.Position -= Vector3.UnitX * DeltaTime * meshSpeed;
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e) {
@@ -176,8 +197,6 @@ namespace FrameworkGL
             base.OnRenderFrame(e);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            hud.Draw();
-
             shader.TransformationMatrix = movingMonkey.ModelMatrix * ActiveCamera.CameraMatrix;
             shader.Activate();
             movingMonkey.Draw();
@@ -193,6 +212,13 @@ namespace FrameworkGL
             rotatingMonkey.Draw();
             shader.Deactivate();
 
+            GL.FrontFace(FrontFaceDirection.Cw);
+            shader.TransformationMatrix = pyramid.ModelMatrix * ActiveCamera.CameraMatrix;
+            shader.Activate();
+            pyramid.Draw();
+            shader.Deactivate();
+            GL.FrontFace(FrontFaceDirection.Ccw);
+
             shaderTextured.TransformationMatrix = wall.ModelMatrix * ActiveCamera.CameraMatrix;
             shaderTextured.Activate();
             wall.Draw();
@@ -203,6 +229,9 @@ namespace FrameworkGL
             ground.Draw();
             shaderTextured.Deactivate();
 
+            hud.Write("FPS: " + fps);
+            hud.Draw();
+            
             SwapBuffers();
         }
 
@@ -217,7 +246,7 @@ namespace FrameworkGL
                 Exit();
 
             if (e.Key == Key.F)
-                Console.WriteLine("Frame rate: " + (float)RenderFrequency);
+                fps = (float)RenderFrequency;
 
             if (e.Key == Key.R){
                 ActiveCamera = new Camera(new Vector3(0, 0, 5), new Vector3(0, 0, -1), Vector3.UnitY);

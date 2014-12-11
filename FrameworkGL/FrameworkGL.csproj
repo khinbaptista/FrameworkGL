@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camera.cs" />
+    <Compile Include="Font2D.cs" />
     <Compile Include="GameElement.cs" />
     <Compile Include="GameMain.cs" />
     <Compile Include="HUD.cs" />

@@ -14,180 +14,132 @@ namespace FrameworkGL
     {
         #region Attributes
 
-        protected Texture texture;
-        protected Model canvas;
-        protected Vector2 dimensions;
+        private Mesh canvas;
+        private Texture texture;
+        private Vector2[] texCoordsFull;
 
-        protected readonly Vector2[] originalUVs;
-        protected List<Vector2> UVs;
+        private Vector2 position;
+        private float rotation;
+        private float scale;
+        private Vector2 dimensions;
+        private int layer;
 
         #endregion
-
 
         #region Properties
 
-        public Vector2 Position
-        {
-            get { return canvas.Position.Xy; }
-            set { canvas.Position = new Vector3(value.X, value.Y, canvas.Position.Z); }
-        }
-
-        public float Width
-        {
-            get { return this.dimensions.X; }
-            set { this.dimensions.X = value; this.UpdateCanvas(); }
-        }
-
-        public float Height
-        {
-            get { return this.dimensions.Y; }
-            set { this.dimensions.Y = value; this.UpdateCanvas(); }
-        }
-
-        public float DepthLayer
-        {
-            get { return canvas.Position.Z; }
-            set { canvas.Position = new Vector3(Position.X, Position.Y, value); }
-        }
-
-        public float Rotation
-        {
-            get { return canvas.Rotation.Z; }
-            set { canvas.Rotation = Quaternion.FromAxisAngle(Vector3.UnitZ, value); }
+        public Vector2 Position {
+            get { return position; }
+            set { position = value; }
         }
 
         public float Scale {
-            get { return canvas.Scale; }
-            set { canvas.Scale = value; }
+            get { return scale; }
+            set { scale = value; }
         }
 
-        public Texture Texture
-        {
-            get { return this.texture; }
-            set { this.texture = value; }
+        public float Rotation {
+            get { return rotation; }
+            set { rotation = value; }
         }
 
         public Matrix4 ModelMatrix {
-            get { return canvas.ModelMatrix; }
+            get {
+                return
+                    Matrix4.CreateScale(scale) *
+                    Matrix4.CreateRotationZ(rotation) *
+                    Matrix4.CreateTranslation(new Vector3(position.X, position.Y, 0));
+            }
+        }
+
+        public Texture Image {
+            get { return texture; }
+            set { texture = value; }
         }
 
         #endregion
 
-
         #region Methods
-        
-        public Sprite(Rectangle position, int layer = 2)
-        {
-            originalUVs = new Vector2[4];
-            originalUVs[0] = new Vector2(0, 0);
-            originalUVs[1] = new Vector2(1, 0);
-            originalUVs[2] = new Vector2(0, 1);
-            originalUVs[3] = new Vector2(1, 1);
 
-            UVs = new List<Vector2>(4);
-            foreach (Vector2 v in originalUVs)
-                UVs.Add(v);
+        public Sprite(Rectangle area, Texture image, int layer = 5) {
+            position = new Vector2(area.X, area.Y);
+            rotation = 0.0f;
+            scale = 1.0f;
+            this.layer = layer;
+            dimensions = new Vector2(area.Width, area.Height);
 
-            this.dimensions = new Vector2(position.Width, position.Height);
+            texCoordsFull = new Vector2[4];
+            texCoordsFull[0] = new Vector2(0, 1);
+            texCoordsFull[1] = new Vector2(0, 0);
+            texCoordsFull[2] = new Vector2(1, 1);
+            texCoordsFull[3] = new Vector2(1, 0);
 
-            Mesh mesh = new Mesh();
-            mesh.AddVertex(new Vector3(0, 0, layer));
-            mesh.AddTexCoord(UVs[0]);
-            mesh.AddVertex(new Vector3(dimensions.X, 0, layer));
-            mesh.AddTexCoord(UVs[1]);
-            mesh.AddVertex(new Vector3(0, -dimensions.Y, layer));
-            mesh.AddTexCoord(UVs[2]);
-            mesh.AddVertex(new Vector3(dimensions.X, -dimensions.Y, layer));
-            mesh.AddTexCoord(UVs[3]);
-            mesh.AddIndices(new uint[] { 0, 1, 2, 2, 1, 3 });
-            mesh.SetUp();
+            ClipToFullTexture();
 
-            canvas = new Model(mesh);
-
-            this.Position = new Vector2(position.X, position.Y);
-            this.DepthLayer = layer;
+            texture = image;
         }
 
-        private void UpdateCanvas()
-        {
-            if (canvas == null)
-                throw new ArgumentNullException("canvas", "The mesh for this sprite is not initialized, somehow. This should never happen.");
+        public void ClipToFullTexture() {
+            canvas = new Mesh();
+            canvas.AddVertex(new Vector3(0, 0, layer));
+            canvas.AddTexCoord(texCoordsFull[0]);
 
-            Vector3 position = canvas.Position;
+            canvas.AddVertex(new Vector3(0, dimensions.Y, layer));
+            canvas.AddTexCoord(texCoordsFull[1]);
 
-            Mesh mesh = new Mesh();
+            canvas.AddVertex(new Vector3(dimensions.X, 0, layer));
+            canvas.AddTexCoord(texCoordsFull[2]);
 
-            mesh = new Mesh();
+            canvas.AddVertex(new Vector3(dimensions.X, dimensions.Y, layer));
+            canvas.AddTexCoord(texCoordsFull[3]);
 
-            mesh.AddVertex(new Vector3(0, 0, position.Z));
-            mesh.AddTexCoord(UVs[0]);
-
-            mesh.AddVertex(new Vector3(dimensions.X, 0, position.Z));
-            mesh.AddTexCoord(UVs[1]);
-
-            mesh.AddVertex(new Vector3(0, -dimensions.Y, position.Z));
-            mesh.AddTexCoord(UVs[2]);
-
-            mesh.AddVertex(new Vector3(dimensions.X, -dimensions.Y, position.Z));
-            mesh.AddTexCoord(UVs[3]);
-
-            mesh.AddIndices(new uint[] { 2, 1, 0, 3, 1, 2 });
-            mesh.SetUp();
-
-            canvas = new Model(mesh);
-            canvas.Position = position;
-
-            this.Update();
+            canvas.AddIndices(new uint[] { 2, 1, 0, 3, 1, 2 });
+            canvas.SetUp();
         }
 
-        public void ChangeClipper(Rectangle clipper)
-        {
-            ChangeClipper(clipper.X, clipper.X + clipper.Width, clipper.Y, clipper.Y + clipper.Height);
+        /// <summary>
+        /// Changes the texture clipper for this texture (will not change the position or size of the sprite)
+        /// </summary>
+        /// <param name="clipper">Rectangle with the origin at its top left corner, in pixels of the texture</param>
+        public void Clip(Rectangle clipper) {
+            this.Clip(clipper.X, clipper.X + clipper.Width, clipper.Y + clipper.Height, clipper.Y);
         }
 
-        public void ChangeClipper(int left, int right, int bottom, int top)
-        {
-            float newX;
-            float newY;
 
-            UVs = new List<Vector2>(4);
+        public void Clip(int left, int right, int bottom, int top){
+            Vector2 newPos = new Vector2();
+            Vector2 newSize = new Vector2();
 
-            newX = (float)left / (float)texture.Width;
-            newY = (float)bottom / (float)texture.Height;
-            UVs.Add(new Vector2(newX, newY));
+            newPos.X = (float)left / (float)texture.Width;
+            newPos.Y = (float)top / (float)texture.Height;
+            newSize.X = (float)right / (float)texture.Width;
+            newSize.Y = (float)bottom / (float)texture.Height;
 
-            newX = (float)right / (float)texture.Width;
-            UVs.Add(new Vector2(newX, newY));
-
-            newX = (float)left / (float)texture.Width;
-            newY = (float)top / (float)texture.Height;
-            UVs.Add(new Vector2(newX, newY));
-
-            newX = (float)right / (float)texture.Width;
-            UVs.Add(new Vector2(newX, newY));
-
-            UpdateCanvas();
+            this.UpdateMesh(newPos, newSize);
         }
 
-        public void ChangeClipperFull()
-        {
-            UVs = new List<Vector2>(4);
-            foreach (Vector2 v in originalUVs)
-                UVs.Add(v);
+        private void UpdateMesh(Vector2 position, Vector2 size) {
+            canvas = new Mesh();
+            canvas.AddVertex(new Vector3(0, 0, layer));
+            canvas.AddTexCoord(new Vector2(position.X, size.Y));
 
-            UpdateCanvas();
+            canvas.AddVertex(new Vector3(0, dimensions.Y, layer));
+            canvas.AddTexCoord(new Vector2(position.X, position.Y));
+
+            canvas.AddVertex(new Vector3(dimensions.X, 0, layer));
+            canvas.AddTexCoord(new Vector2(size.X, size.Y));
+
+            canvas.AddVertex(new Vector3(dimensions.X, dimensions.Y, layer));
+            canvas.AddTexCoord(new Vector2(size.X, position.Y));
+
+            canvas.AddIndices(new uint[] { 2, 1, 0, 3, 1, 2 });
+            canvas.SetUp();
         }
 
-        public virtual void Update() { }
-
-        public virtual void Draw()
-        {
-            if (texture == null)
-                throw new ArgumentNullException("texture", "No texture has been assigned to this sprite.");
-
-            GL.BindTexture(TextureTarget.Texture2D, texture);
+        public void Draw() {
+            texture.Bind();
             canvas.Draw();
-            GL.BindTexture(TextureTarget.Texture2D, 0);
+            texture.Unbind();
         }
 
         #endregion

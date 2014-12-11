@@ -12,40 +12,34 @@ namespace FrameworkGL
     {
         private Camera camera;
         private Shader shader;
+        
+        Sprite sprite;
+        Font2D font;
 
-        private Model model;
-        private Texture texture;
-
-        public HUD(Rectangle client, int layer = 3) {
+        public HUD(Rectangle client, int layer = 5) {
             camera = Camera.New2D(client);
             shader = Shader.Textured;
-
-            Mesh wall = new Mesh();
-            wall.AddVertex(new Vector3(0, 0, layer));
-            wall.AddVertex(new Vector3(0, 256, layer));
-            wall.AddVertex(new Vector3(256, 0, layer));
-            wall.AddVertex(new Vector3(256, 256, layer));
-            wall.AddTexCoord(new Vector2(0.0f, 1.0f));
-            wall.AddTexCoord(new Vector2(0.0f, 0.0f));
-            wall.AddTexCoord(new Vector2(1.0f, 1.0f));
-            wall.AddTexCoord(new Vector2(1.0f, 0.0f));
-            wall.AddIndices(new uint[] { 2, 1, 0, 3, 1, 2 });
-            wall.SetUp();
-            model = new Model(wall);
             
-            texture = new Texture(@"img\gradientGB.png");
-            shader.Texture = texture;
-            shader.TransformationMatrix = model.ModelMatrix * camera.CameraMatrix;
+            sprite = new Sprite(new Rectangle(0, 0, 128, 128), new Texture(@"img\gradientGB.png"), layer);
+            
+            font = new Font2D(new Texture(@"img\Courier.png"), 16, 8);
+        }
+
+        public void Write(string message) {
+            Vector2 position = new Vector2();
+            position.X = GameMain.Viewport.Width - 300;
+            position.Y = GameMain.Viewport.Height - 50;
+            font.Write(shader, camera.CameraMatrix, position, message);
         }
 
         public void Draw() {
-            shader.TransformationMatrix = model.ModelMatrix * camera.CameraMatrix;
-            shader.Activate();
-            texture.Bind();
+            font.Write(shader, camera.CameraMatrix, new Vector2(50, GameMain.Viewport.Height - 50),
+                "CGP2012M - ROD14465894 - Khin Baptista");
 
-            model.Draw();
-            
-            texture.Unbind();
+            shader.TransformationMatrix = sprite.ModelMatrix * camera.CameraMatrix;
+            shader.Texture = sprite.Image;
+            shader.Activate();
+            sprite.Draw();
             shader.Deactivate();
         }
     }

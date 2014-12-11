@@ -250,18 +250,17 @@ namespace FrameworkGL
             MeshData vertex_data = new MeshData();
             int[] faceParamsIndices = new int[3];
 
-            int lineCount = 0;
             string line;
             string[] tokens;
             char[] splitchar = new char[] { ' ' };
             char[] splitparamschar = new char[] { '/' };
 
+            Console.WriteLine("Started loading Wavefront file " + Path.GetFileName(filepath));
             System.Diagnostics.Stopwatch timer = new System.Diagnostics.Stopwatch();
             timer.Start();
 
             while (!obj_file.EndOfStream) {
                 line = obj_file.ReadLine();
-                Console.WriteLine("Reading line " + lineCount++);
                 if (line == "" || line.StartsWith("#"))
                     continue;
 
