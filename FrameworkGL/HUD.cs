@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using OpenTK;
+using OpenTK.Graphics.OpenGL4;
 
 namespace FrameworkGL
 {
@@ -41,6 +42,12 @@ namespace FrameworkGL
             shader.Activate();
             sprite.Draw();
             shader.Deactivate();
+        }
+
+        public void Delete() {
+            GL.DeleteShader(shader);
+            sprite.Delete();
+            font.Delete();
         }
     }
 }

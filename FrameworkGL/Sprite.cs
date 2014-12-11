@@ -80,6 +80,9 @@ namespace FrameworkGL
         }
 
         public void ClipToFullTexture() {
+            if (canvas != null)
+                canvas.Delete();
+
             canvas = new Mesh();
             canvas.AddVertex(new Vector3(0, 0, layer));
             canvas.AddTexCoord(texCoordsFull[0]);
@@ -119,6 +122,9 @@ namespace FrameworkGL
         }
 
         private void UpdateMesh(Vector2 position, Vector2 size) {
+            if (canvas != null)
+                canvas.Delete();
+
             canvas = new Mesh();
             canvas.AddVertex(new Vector3(0, 0, layer));
             canvas.AddTexCoord(new Vector2(position.X, size.Y));
@@ -140,6 +146,10 @@ namespace FrameworkGL
             texture.Bind();
             canvas.Draw();
             texture.Unbind();
+        }
+
+        public void Delete() {
+            canvas.Delete();
         }
 
         #endregion

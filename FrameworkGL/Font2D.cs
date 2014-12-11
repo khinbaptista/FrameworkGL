@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Drawing;
 using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL4;
 
 namespace FrameworkGL
 {
@@ -53,6 +54,9 @@ namespace FrameworkGL
             shader.Texture = source;
             source.Bind();
 
+            if (canvas != null)
+                canvas.Delete();
+
             canvas = new Sprite(new Rectangle(0, 0, (int)charDimensions.X, (int)charDimensions.Y), source, layer);
 
             int counter = 0;
@@ -78,6 +82,11 @@ namespace FrameworkGL
                 size += (int)charDimensions.X;
 
             return size;
+        }
+
+        public void Delete() {
+            GL.DeleteTexture(source);
+            canvas.Delete();
         }
 
         #endregion

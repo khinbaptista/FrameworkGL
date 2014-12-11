@@ -18,7 +18,7 @@ namespace FrameworkGL
         public static Rectangle Viewport { get; protected set; }
         public static Camera ActiveCamera { get; protected set; }
         public static float DeltaTime { get; protected set; }
-        public static readonly bool useMouse = false;
+        public static readonly bool useMouse = true;
 
         float fps;
 
@@ -259,6 +259,20 @@ namespace FrameworkGL
 
             GL.Viewport(0, 0, Width, Height);
             ActiveCamera.ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45), (float)Width / (float)Height, 0.1f, 100.0f);
+        }
+
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e) {
+            movingMonkey.Delete();
+            rotatingMonkey.Delete();
+            pyramid.Delete();
+            dragon.Delete();
+
+            hud.Delete();
+
+            GL.DeleteShader(shader);
+            GL.DeleteShader(shaderTextured);
+
+            base.OnClosing(e);
         }
 
         #endregion

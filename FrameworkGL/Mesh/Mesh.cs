@@ -236,6 +236,15 @@ namespace FrameworkGL
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
         }
 
+        public void Delete() {
+            GL.DeleteBuffer(positionBuffer);
+            GL.DeleteBuffer(colorBuffer);
+            GL.DeleteBuffer(normalBuffer);
+            GL.DeleteBuffer(texCoordBuffer);
+            GL.DeleteBuffer(indexBuffer);
+            GL.DeleteVertexArray(id);
+        }
+
         #endregion
 
         #region Load from file

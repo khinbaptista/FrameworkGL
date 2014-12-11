@@ -66,6 +66,10 @@ namespace FrameworkGL
             Mesh.DrawAsPoints = !Mesh.DrawAsPoints;
         }
 
+        public void Delete() {
+            Mesh.Delete();
+        }
+
         #region Presets
 
         public static Model Triangle(bool normal = true, bool texture = true, bool colour = false) {
